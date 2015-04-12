@@ -22,6 +22,7 @@ module Matrix
       @files = []
       @raw = ""
       @content = load_default_config
+      load_cct_config
       load_story_configs
       #TODO: load_env_config
     end
@@ -48,6 +49,13 @@ module Matrix
       end
       files << default_config
       load_content(default_config.to_s)
+    end
+
+    def load_cct_config
+      content["cct"].each do |cct_file|
+        next unless File.exist?(cct_file)
+        merge!(cct_file)
+      end
     end
 
     # Assuming the default config file is already loaded in content
