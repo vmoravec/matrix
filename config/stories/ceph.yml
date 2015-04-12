@@ -1,0 +1,14 @@
+story:
+  ceph: &ceph
+    desc: Virtual default deployment story for ceph
+    mkcloud:
+      <<: *mkcloud
+      nodenumber: <%= ENV['nodenumber'] || 4 %>
+      cephvolumenumber: <%= ENV['cephvolumenumber'] || 1 %>
+      cephvolume_hdd_size: 21
+      controller_ceph_hdd_size: 25
+      lvm_size: <%= ENV['lvm_size'] || '260G' %>
+
+    runners:
+      <<: *runners
+

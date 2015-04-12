@@ -5,6 +5,7 @@ require "matrix/version"
 require "matrix/cct"
 require "matrix/config"
 require "matrix/dsl"
+require "matrix/story_task"
 
 module Matrix
   LOG_TAG = "MATRIX"
@@ -37,6 +38,10 @@ module Matrix
 
     def update_logger base_logger
       @logger = base_logger.base
+    end
+
+    def build_story_tasks!
+      config.content["story"].each {|story| StoryTask.new(*story) }
     end
   end
 end

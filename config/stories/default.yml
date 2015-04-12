@@ -19,7 +19,10 @@ story:
       controller_hdd_size: <%= ENV['controller_hdd_size'] || '40G' %>
 
     # if ENV['ignore_features'] is defined, tests are ignored and not run
-    runners:
+    runners: &runners
+      mkcloud:cleanup: no feature
+      mkcloud:prepare: {}
+      mkcloud:setupadmin: {}
       mkcloud:crowbarinst:
         features: &admin
           admin:

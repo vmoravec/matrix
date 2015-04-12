@@ -4,4 +4,11 @@ automation:
     branch: master
 
 vendor_dir: "vendor/"
-cct_config: "cct.yml"
+
+stories:
+  - default.yml
+  - ceph.yml
+  - ha.yml
+
+cct:
+  - cct.yml
