@@ -1,0 +1,7 @@
+automation:
+  git:
+    url: github.com:suse-cloud/automation
+    branch: master
+
+vendor_dir: "vendor/"
+cct_config: "cct.yml"

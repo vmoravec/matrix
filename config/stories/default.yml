@@ -1,0 +1,55 @@
+---
+story:
+  default: &default
+    desc: Default matrix for virtual deployment with linuxbridge as network plugin
+    ignore_features: <%= ENV['ignore_features'] || false %>
+    mkcloud: &mkcloud
+      cloudsource: <%= ENV['cloudsource'] || 'develcloud5' %>
+      net_public: 192.168.173
+      net_fixed: 192.168.174
+      net_admin: 192.168.175
+      adminnetmask: 255.255.248.0
+      TESTHEAD: <%= ENV['TESTHEAD'] || 1 %>
+      UPDATEREPOS: <%= ENV['UPDATEREPOS'] || 1 %>
+      nodenumber: <%= ENV['nodenumber'] || 3 %>
+      networkingplugin: <%= ENV['networkingplugin'] || 'linuxbridge' %>
+      compute_node_memory: <%= ENV['compute_node_memory'] || 4194304 %>
+      lvm_size: <%= ENV['lvm_size'] || '160G' %>
+      computenode_hdd_size: <%= ENV['computenode_hdd_size'] || '20G' %>
+      controller_hdd_size: <%= ENV['controller_hdd_size'] || '40G' %>
+
+    # if ENV['ignore_features'] is defined, tests are ignored and not run
+    runners:
+      mkcloud:crowbarinst:
+        features: &admin
+          admin:
+            - core
+
+      mkcloud:setupcompute:
+        features:
+          <<: *admin
+          controller:
+            - core
+          nova:
+            - core
+
+      mkcloud:compute_nodes:
+        features:
+          <<: *admin
+          nova:
+            - import_images
+            - delete_images
+          keystone:
+            - add_user
+            - add_plugin
+
+      mkcloud:controller_restart:
+      mkcloud:crowbarreboot:
+
+  default:openswitch:
+    <<: *default
+    desc: Default matrix for virtual deployment with openswitch as network plugin
+    mkcloud:
+      <<: *mkcloud
+      networkingplugin: openswitch
+
