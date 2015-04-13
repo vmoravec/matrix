@@ -9,6 +9,7 @@
 /tmp/
 /vendor
 /log
+/config
 *.bundle
 *.so
 *.o

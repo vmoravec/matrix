@@ -24,7 +24,8 @@ module Matrix
       @content = load_default_config
       load_cct_config
       load_story_configs
-      #TODO: load_env_config
+      #TODO: Still missing
+      load_env_config
     end
 
     def [](config_value)
@@ -53,12 +54,12 @@ module Matrix
 
     def load_cct_config
       content["cct"].each do |cct_file|
-        next unless File.exist?(cct_file)
+        next unless File.exist?(dir.join(cct_file))
         merge!(cct_file)
       end
     end
 
-    # Assuming the default config file is already loaded in content
+    # Assuming the default config file is already loaded in #content
     def load_story_configs
       load_default_story
       content['stories'].reject {|s| s == DEFAULT_STORY }.each do |story|
@@ -84,7 +85,12 @@ module Matrix
       raw << story.join if story
     end
 
+    #TODO: this has several parts because the basic configs are loaded differently from
+    #      the stories' configs. The yaml/json data might be loaded from a provided param
+    #      at the beginning as a whole, then split into the 'main' part and the 'story' part
+    #      and proceed when it's needed during the config build time.
     def load_env_config
+      return
       env_config = ENV["config"]
       return if env_config.to_s.empty?
 

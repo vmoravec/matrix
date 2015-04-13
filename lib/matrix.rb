@@ -41,7 +41,7 @@ module Matrix
     end
 
     def build_story_tasks!
-      config.content["story"].each {|story| StoryTask.new(*story) }
+      config["story"].each {|story| StoryTask.new(*story) }
     end
   end
 end
