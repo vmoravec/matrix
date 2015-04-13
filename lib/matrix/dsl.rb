@@ -1,5 +1,13 @@
 module Rake
   module DSL
+    def log tag=nil
+      if tag && tag == :matrix
+        Matrix.logger
+      else
+        Cct.logger
+      end
+    end
+
     def matrix
       Matrix
     end
@@ -8,12 +16,16 @@ module Rake
       Matrix.cct
     end
 
-    def invoke_feature task_name
-      ENV["cct_log_path"] = Matrix.root.join(Matrix::LOG_DIR, ::Cct::LOG_FILENAME).to_s
+    def mkcloud
+      @mkcloud ||= Matrix::Mkcloud.new
+    end
 
-      Dir.chdir(matrix.cct.gem_dir) do
-        invoke_task(task_name)
-      end
+    def command
+      Matrix.command
+    end
+
+    def invoke_feature task_name
+      Matrix::FeatureTask.invoke_feature(task_name)
     end
   end
 end

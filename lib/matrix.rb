@@ -6,17 +6,22 @@ require "matrix/cct"
 require "matrix/config"
 require "matrix/dsl"
 require "matrix/story_task"
+require "matrix/runner_task"
+require "matrix/feature_task"
+
+LocalUser = ::Cct::LocalUser
+BaseLogger = ::Cct::BaseLogger
+LocalCommand = ::Cct::LocalCommand
+
+require "matrix/mkcloud"
 
 module Matrix
   LOG_TAG = "MATRIX"
   LOG_FILENAME = "matrix.log"
   LOG_DIR = "log/"
 
-  LocalUser = ::Cct::LocalUser
-  BaseLogger = ::Cct::BaseLogger
-
   class << self
-    attr_reader :root, :user, :logger, :config, :hostname, :log_path, :cct
+    attr_reader :root, :user, :logger, :config, :hostname, :log_path, :cct, :command
 
     def setup root_dir, logger: nil, verbose: false, log_path: nil
       @verbose = verbose == true
@@ -28,6 +33,7 @@ module Matrix
       @logger = logger || BaseLogger.new(
         LOG_TAG, verbose: verbose?, path: @log_path
       ).base
+      @command = LocalCommand.new("MATRIX", logger: @logger)
       @cct = Matrix::Cct.new(verbose?,root.join(LOG_DIR, ::Cct::LOG_FILENAME).expand_path)
       self
     end

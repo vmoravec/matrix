@@ -1,7 +1,7 @@
 ---
 story:
   default: &default
-    desc: Default matrix for virtual deployment with linuxbridge as network plugin
+    desc: Default setup for virtual deployment with linuxbridge as network plugin
     ignore_features: <%= ENV['ignore_features'] || false %>
     mkcloud: &mkcloud
       cloudsource: <%= ENV['cloudsource'] || 'develcloud5' %>
@@ -26,15 +26,12 @@ story:
       mkcloud:crowbarinst:
         features: &admin
           admin:
-            - core
 
       mkcloud:setupcompute:
         features:
           <<: *admin
           controller:
-            - core
           nova:
-            - core
 
       mkcloud:compute_nodes:
         features:
@@ -51,7 +48,7 @@ story:
 
   default:openswitch:
     <<: *default
-    desc: Default matrix for virtual deployment with openswitch as network plugin
+    desc: Default setup for virtual deployment with openswitch as network plugin
     mkcloud:
       <<: *mkcloud
       networkingplugin: openswitch
