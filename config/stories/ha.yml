@@ -1,0 +1,9 @@
+story:
+  ha: &ha
+    desc: Virtual default deployment story for HA
+    mkcloud:
+      <<: *mkcloud
+      #TODO
+
+    runners:
+      <<: *runners

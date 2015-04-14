@@ -81,7 +81,14 @@ module Matrix
     end
 
     def load_raw_story file
-      story = File.read(dir.join(STORIES_DIR, file)).lines.slice_after(/story:/).entries.last
+      #FIXME ruby 2.2 added #slise_after into Enumerable; use like: slice_after(/story:/).entries.last
+      story = File.read(dir.join(STORIES_DIR, file)).lines.slice_before(/story:/).entries
+      #FIXME Remove this when slice_after has been added
+      abort "Node 'story:' not found in config file '#{file}'" if story.empty?
+
+      #FIXME Remove this when slice_after has been added
+      story = story.first[1..-1]
+
       raw << story.join if story
     end
 
