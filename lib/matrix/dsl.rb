@@ -24,8 +24,5 @@ module Rake
       Matrix.command
     end
 
-    def invoke_feature task_name
-      Matrix::FeatureTask.invoke_feature(task_name)
-    end
   end
 end

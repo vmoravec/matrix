@@ -15,7 +15,6 @@ module Matrix
 
       def invoke_feature task_name
         ENV["cct_log_path"] = Matrix.root.join(Matrix::LOG_DIR, ::Cct::LOG_FILENAME).to_s
-
         Dir.chdir(Matrix.cct.gem_dir) do
           Rake::Task[task_name].invoke
         end

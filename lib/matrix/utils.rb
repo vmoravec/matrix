@@ -5,6 +5,9 @@ module Matrix
       MODPROBE_BIN = "/sbin/modprobe"
       TEMP_DIR = "tmp/"
       MANDATORY_CONF_KEYS = %w(
+        cloud
+        cloudpv
+        virtualcloud
         cloudsource
         net_public
         net_fixed
@@ -21,15 +24,15 @@ module Matrix
         path = Matrix.root.join(TEMP_DIR, "#{filename}.img")
         if File.exist?(path)
           puts "Creating new filesystem in `#{path}"
-          check_filesystem(path)
+          create_filesystem(path)
         else
           puts "Creating image file in `#{path}"
           command.exec!("qemu-img create -f raw #{path} #{size}")
-          check_filesystem(path)
+          create_filesystem(path)
         end
       end
 
-      def check_filesystem file
+      def create_filesystem file
         command.exec!("mkfs -t ext4 #{file}")
       end
 
@@ -45,17 +48,8 @@ module Matrix
         !Matrix.user.root?
       end
 
-      def validate_mkcloud_config! config
-        MANDATORY_CONF_KEYS.each do |key|
-          if !config.keys.include?(key)
-            abort "Invalid mkcloud config, missing '#{key}' value"
-          end
-        end
-        config
-      end
-
       def detect_config! story_name, env
-        validate_else!
+        validate_base!
 
         story_name = story_name || ENV["story"]
         if story_name.nil?
@@ -64,6 +58,8 @@ module Matrix
         end
 
         story_config, story_name = detect_story_config!(story_name, env)
+
+        update_config(story_config, story_name)
 
         validate_mkcloud_config!(story_config)
         [ story_config, story_name ]
@@ -76,7 +72,7 @@ module Matrix
           if story && story["mkcloud"]
             [ story["mkcloud"], name ]
           else
-            abort "Config for story '#{name}' not detected, mkcloud can't run"
+            abort "Config for story '#{name}' not detected"
           end
         when Hash
           story = config["mkcloud"]
@@ -88,11 +84,34 @@ module Matrix
         end
       end
 
-      def validate_else!
+      def update_config config, story_name
+        log(:matrix).info "Updating story config: cloud => #{story_name}"
+        config["cloud"] = story_name
+        config["cloudpv"] = detect_loop_device(story_name)
+        config["cloudbr"] = story_name + "-br"
+        config["virtualcloud"] = story_name
+        config
+      end
+
+      def detect_loop_device story_name
+        losetup("-j", story_name).output.split(":").first
+      end
+
+      def validate_base!
         if !Dir.exist?(matrix.config["vendor_dir"] + Matrix::Mkcloud::SCRIPT_DIR)
           abort "Missing automation repository. Try `rake git:automation:clone`"
         end
       end
+
+      def validate_mkcloud_config! config
+        MANDATORY_CONF_KEYS.each do |key|
+          if !config.keys.include?(key)
+            abort "Invalid mkcloud config, missing '#{key}' value"
+          end
+        end
+        config
+      end
+
     end
   end
 end

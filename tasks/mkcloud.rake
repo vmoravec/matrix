@@ -8,17 +8,25 @@ namespace :mkcloud do
 
   desc "Prepare the environment for cloud installation"
   task :prepare, [:story_name, :env] do |_, args|
-    with_utils do
-      config, story_name = detect_config!(args[:story_name], args[:env])
-      create_image(story_name, config["lvm_size"])
-      log(:matrix).info "Preparing story '#{story_name}' with config:"
-      log(:matrix).info config.to_yaml
-      mkcloud.exec! :prepare, config
+    detect_config(args) do |story|
+      create_image(story.name, story.config["lvm_size"])
+      configure_loop_device
+      log(:matrix).info "Preparing story '#{story.name}' with config:"
+      log(:matrix).info story.config.to_yaml
+      mkcloud.exec! :prepare, story.config
     end
   end
 
   def with_utils
     include Matrix::Utils::Mkcloud
     yield
+  end
+
+  Story = Struct.new(:config, :name)
+
+  def detect_config args
+    with_utils do
+      yield Story.new(*detect_config!(args[:story_name], args[:env]))
+    end
   end
 end
