@@ -1,11 +1,12 @@
 module Matrix
   class RunnerTask
-    attr_reader :features, :feature_tasks, :runner_name, :log, :config
+    attr_reader :features, :feature_tasks, :runner_name, :log, :config, :story_name
 
-    # @param [Array<string, nil|String|Hash>]
+    # @param [Array<string, Hash|String|nil, Hash>]
     #   @Example:
-    #   ["mkcloud:cleanup", {"features" => {"admin" => nil}}]
-    def initialize config
+    #   ["mkcloud:cleanup", {"features" => {"admin" => nil}}, {"mkcloud"=> {...}}]
+    def initialize story_name, config
+      @story_name = story_name
       @log = Matrix.logger
       @runner_name = config.first
       @features = detect_features(config[1])
@@ -14,7 +15,7 @@ module Matrix
     end
 
     def invoke
-       Rake::Task[runner_name].invoke(config)
+       Rake::Task[runner_name].invoke(story_name, config)
       feature_tasks.each(&:invoke)
     end
 

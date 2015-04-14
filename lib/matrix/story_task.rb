@@ -2,11 +2,11 @@ require 'rake/tasklib'
 
 module Matrix
   class StoryTask < ::Rake::TaskLib
-    attr_reader :name, :data
+    attr_reader :name, :config
 
-    def initialize name, data
+    def initialize name, config
       @name = name
-      @data = data
+      @config = config
       @verbose = Matrix.verbose?
       define_tasks
     end
@@ -14,8 +14,8 @@ module Matrix
     private
 
     def run_task name
-      data["runners"]
-      .map {|runner| RunnerTask.new(runner << data["mkcloud"]) }
+      config["runners"]
+      .map {|runner| RunnerTask.new(name, runner << config) }
       .each(&:invoke)
     end
 
@@ -28,12 +28,12 @@ module Matrix
 
           # Not showing task desc on purpose
           task :runners do
-            puts data["runners"].keys
+            puts config["runners"].keys
           end
 
           # Not showing task desc on purpose
           task :features do
-            data["runners"].each_pair do |runner, features|
+            config["runners"].each_pair do |runner, features|
               puts runner
               next if features.nil?
 
@@ -48,7 +48,7 @@ module Matrix
           end
         end
 
-        desc data["desc"]
+        desc config["desc"]
         task name => "story:#{name}:run"
       end
 

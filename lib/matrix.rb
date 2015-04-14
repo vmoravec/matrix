@@ -8,7 +8,9 @@ require "matrix/dsl"
 require "matrix/story_task"
 require "matrix/runner_task"
 require "matrix/feature_task"
+require "matrix/utils"
 
+#FIXME hackish mockish
 LocalUser = ::Cct::LocalUser
 BaseLogger = ::Cct::BaseLogger
 LocalCommand = ::Cct::LocalCommand

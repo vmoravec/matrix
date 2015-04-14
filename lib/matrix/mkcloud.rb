@@ -1,19 +1,17 @@
 module Matrix
   class Mkcloud < LocalCommand
-    COMMAND  = "mkcloud"
+    COMMAND    = "mkcloud"
+    SCRIPT_DIR = "automation/scripts/"
 
-    attr_reader :bin_path
+    attr_reader :bin_path, :log
 
     def initialize
-      @log = BaseLogger.new("MKCLOUD")
-      @bin_path = Matrix.config["vendor_dir"] + "automation/scripts/"
+      @log = Matrix.logger
+      @bin_path = Matrix.config["vendor_dir"] + SCRIPT_DIR
     end
 
     def exec! action, env
       command = bin_path + COMMAND
-      env = env[:env]
-      puts env.inspect
-      #TODO export the environment variables from env
       super("sudo #{env.map {|c| "#{c[0]}=#{c[1]}" }.join(" ")} #{command} #{action}")
     end
   end
