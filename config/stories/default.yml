@@ -38,7 +38,7 @@ story:
         features: &admin
           admin:
 
-      mkcloud:setupcompute:
+      mkcloud:installnodes:
         features:
           <<: *admin
           controller:

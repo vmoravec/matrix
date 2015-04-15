@@ -36,6 +36,16 @@ namespace :mkcloud do
     end
   end
 
+  desc "Set up & install controller and compute nodes"
+  task :installnodes, [:story_name, :env] do |_, args|
+    detect_config(args) do |story|
+      mkcloud.exec!(
+        "setupcompute instcompute",
+        story.config
+      )
+    end
+  end
+
   def with_utils
     include Matrix::Utils::Mkcloud
     yield
