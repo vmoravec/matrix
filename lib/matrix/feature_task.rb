@@ -44,7 +44,7 @@ module Matrix
     end
 
     def invoke
-      log.info("Invoking task '#{name}' from matrix...")
+      log.info("Invoking task '#{feature}' from matrix...")
       self.class.invoke_feature(feature, story_name)
     end
 

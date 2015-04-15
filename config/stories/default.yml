@@ -30,7 +30,6 @@ story:
           user: crowbar
           password: crowbar
 
-    # if ENV['ignore_features'] is defined, tests are ignored and not run
     runners: &runners
       mkcloud:cleanup: no feature
       mkcloud:prepare: no feature
@@ -39,24 +38,10 @@ story:
         features: &admin
           admin:
 
-   #  mkcloud:setupcompute:
-   #    features:
-   #      <<: *admin
-   #      controller:
-   #      nova:
-
-   #  mkcloud:compute_nodes:
-   #    features:
-   #      <<: *admin
-   #      nova:
-   #        - import_images
-   #        - delete_images
-   #      keystone:
-   #        - add_user
-   #        - add_plugin
-
-   #  mkcloud:controller_restart:
-   #  mkcloud:crowbarreboot:
+      mkcloud:setupcompute:
+        features:
+          <<: *admin
+          controller:
 
   default:openswitch:
     <<: *default

@@ -9,6 +9,8 @@ RSpec::Core::RakeTask.new(:spec)
 
 Matrix.setup(__dir__, verbose: verbose)
 
+Rake::TaskManager.record_task_metadata = true
+
 Dir.glob(__dir__ + "/tasks/**/*.rake").each { |task| load(task) }
 
 Matrix.build_story_tasks!
