@@ -10,9 +10,11 @@
 /vendor
 /log
 /config
-mkcloud.pid
 *.bundle
 *.so
 *.o
 *.a
 mkmf.log
+
+mkcloud.pid
+mkcloud.config

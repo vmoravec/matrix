@@ -6,7 +6,7 @@ module Matrix
     attr_reader :bin_path, :log
 
     def initialize
-      @log = Matrix.logger
+      @log = BaseLogger.new("MATRIX", verbose: true, path: Matrix.log_path)
       @bin_path = Matrix.config["vendor_dir"] + SCRIPT_DIR
     end
 

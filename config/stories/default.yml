@@ -18,33 +18,45 @@ story:
       computenode_hdd_size: <%= ENV['computenode_hdd_size'] || '20G' %>
       controller_hdd_size: <%= ENV['controller_hdd_size'] || '40G' %>
 
+
+    cct:
+      admin_node:
+        ip: 192.168.175.10
+        ssh:
+          user: root
+          password: linux
+
+        api:
+          user: crowbar
+          password: crowbar
+
     # if ENV['ignore_features'] is defined, tests are ignored and not run
     runners: &runners
       mkcloud:cleanup: no feature
-      mkcloud:prepare: {}
-      mkcloud:setupadmin: {}
-      mkcloud:crowbarinst:
+      mkcloud:prepare: no feature
+      mkcloud:setupadmin: no feature
+      mkcloud:installcrowbar:
         features: &admin
           admin:
 
-      mkcloud:setupcompute:
-        features:
-          <<: *admin
-          controller:
-          nova:
+   #  mkcloud:setupcompute:
+   #    features:
+   #      <<: *admin
+   #      controller:
+   #      nova:
 
-      mkcloud:compute_nodes:
-        features:
-          <<: *admin
-          nova:
-            - import_images
-            - delete_images
-          keystone:
-            - add_user
-            - add_plugin
+   #  mkcloud:compute_nodes:
+   #    features:
+   #      <<: *admin
+   #      nova:
+   #        - import_images
+   #        - delete_images
+   #      keystone:
+   #        - add_user
+   #        - add_plugin
 
-      mkcloud:controller_restart:
-      mkcloud:crowbarreboot:
+   #  mkcloud:controller_restart:
+   #  mkcloud:crowbarreboot:
 
   default:openswitch:
     <<: *default

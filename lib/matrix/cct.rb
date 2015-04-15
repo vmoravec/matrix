@@ -4,7 +4,7 @@ module Matrix
 
     extend Forwardable
 
-    def_delegators :@cct, :setup, :load_tasks!
+    def_delegators :@cct, :setup, :load_tasks!, :config
 
     attr_reader :gem_dir
 

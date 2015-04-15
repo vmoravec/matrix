@@ -9,4 +9,9 @@ namespace :cct do
     Rake::TaskManager.record_task_metadata = true
     cct.load_tasks!
   end
+
+  task :admin do
+    cct.load_tasks!
+    Matrix::FeatureTask.invoke_feature("feature:admin:services", "default")
+  end
 end

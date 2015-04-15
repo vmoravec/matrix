@@ -20,8 +20,8 @@ module Matrix
         LocalCommand.new(logger: Matrix.logger)
       end
 
-      def create_image filename, size
-        path = Matrix.root.join(TEMP_DIR, "#{filename}.img")
+      def create_image story_name, size
+        path = story_file(story_name)
         if File.exist?(path)
           puts "Creating new filesystem in `#{path}"
           create_filesystem(path)
@@ -30,6 +30,7 @@ module Matrix
           command.exec!("qemu-img create -f raw #{path} #{size}")
           create_filesystem(path)
         end
+        path
       end
 
       def create_filesystem file
@@ -84,17 +85,34 @@ module Matrix
         end
       end
 
+      def story_file name
+        Matrix.root.join(TEMP_DIR, name + ".img").to_s
+      end
+
+      alias_method :story_image, :story_file
+
       def update_config config, story_name
         log(:matrix).info "Updating story config: cloud => #{story_name}"
         config["cloud"] = story_name
-        config["cloudpv"] = detect_loop_device(story_name)
+        config["cloudpv"] = detect_loop_device(story_name) || find_available_loop_device
         config["cloudbr"] = story_name + "-br"
         config["virtualcloud"] = story_name
         config
       end
 
       def detect_loop_device story_name
-        losetup("-j", story_name).output.split(":").first
+        losetup("-j", story_file(story_name)).output.split(":").first
+      end
+
+      def find_available_loop_device
+        losetup("-f").output.strip
+      end
+
+      def detach_story_image story_name
+        device = detect_loop_device(story_name)
+        return unless device
+
+        losetup("-d", device)
       end
 
       def validate_base!

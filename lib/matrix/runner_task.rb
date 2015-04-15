@@ -11,11 +11,11 @@ module Matrix
       @runner_name = config.first
       @features = detect_features(config[1])
       @config = config[2]
-      @feature_tasks = features.map {|feature| FeatureTask.new(*feature) }
+      @feature_tasks = features.map {|feature| FeatureTask.new(*feature.concat([story_name])) }
     end
 
     def invoke
-       Rake::Task[runner_name].invoke(story_name, config)
+      Rake::Task[runner_name].invoke(story_name, config)
       feature_tasks.each(&:invoke)
     end
 

@@ -9,11 +9,11 @@ require "matrix/story_task"
 require "matrix/runner_task"
 require "matrix/feature_task"
 require "matrix/utils"
+require "matrix/local_command"
 
 #FIXME hackish mockish
 LocalUser = ::Cct::LocalUser
 BaseLogger = ::Cct::BaseLogger
-LocalCommand = ::Cct::LocalCommand
 
 require "matrix/mkcloud"
 
