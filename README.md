@@ -8,7 +8,7 @@ Story runner for cloud testsuite
 
   1.  Check [system dependencies](#dependencies)
   2.  `git clone git@github.com:vmoravec/matrix`
-  3.  `cd cct && bundle install`
+  3.  `cd matrix && bundle install`
   4.  `rake git:automation:clone`
   4.  `rake h`
   5.  `rake story:default`
@@ -55,7 +55,7 @@ Story runner for cloud testsuite
 
     rake aborted!
     LoadError: cannot load such file -- cct
-    /home/path/to/code/cct/Rakefile:6:in `<top (required)>'
+    /home/path/to/code/matrix/Rakefile:6:in `<top (required)>'
 
   the rubygems installed in path `vendor/bundle` are not visible to `rake`.
 
@@ -83,6 +83,9 @@ Story runner for cloud testsuite
   Run a story:
 
      rake story:default
+
+  Most of the runners' output goes currently into the log file in `log/matrix.log`, 
+  use `tail -f log/matrix.log`. 
 
   Run unit tests for code inside `lib` directory:
 

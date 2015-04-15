@@ -34,7 +34,7 @@ module Matrix
       end
 
       def create_filesystem file
-        command.exec!("mkfs -t ext4 #{file}")
+        command.exec!("#{sudo} mkfs -t ext4 #{file}")
       end
 
       def losetup *args
