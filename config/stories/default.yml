@@ -38,7 +38,8 @@ story:
         features: &admin
           admin:
 
-      mkcloud:installnodes:
+      mkcloud:installnodes: no feature
+      mkcloud:installproposal:
         features:
           <<: *admin
           controller:

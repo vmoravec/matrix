@@ -18,3 +18,4 @@ mkmf.log
 
 mkcloud.pid
 mkcloud.config
+.artifacts/

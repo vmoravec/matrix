@@ -7,9 +7,10 @@ __`Story runner for cloud testsuite`__
   1.  Check [system dependencies](#dependencies)
   2.  `git clone git@github.com:vmoravec/matrix`
   3.  `cd matrix && bundle install`
-  4.  `rake git:automation:clone`
-  4.  `rake h`
-  5.  `rake story:default`
+  4.  `alias rake="bundle exec rake"` # more on this further below
+  5.  `rake git:automation:clone`
+  6.  `rake h`
+  7.  `rake story:default`
 
 ## Installation
 
@@ -36,6 +37,19 @@ __`Story runner for cloud testsuite`__
   List of required rubygems can be found in file `matrix.gemspec` and in `Gemfile`.
   Additionally, you need to run `rake git:automation:clone` to git required scripts
   for SUSE cloud installation.
+
+
+## Issues
+
+  Currently this program expects you have the kernel module `loop` loaded, it does
+  not that for you automatically. Make sure the `loop` is available by `sudo modprobe loop`.
+
+  Internaly there is the `mkcloud` command used for driving the cloud installation. It 
+  will prompt you to provide your password (or root password, depends on your `/etc/sudoers` file).
+  As a single story calls `mkcloud` several times, the story workflow will fail
+  without you paying attention. I recommend either
+    * `sudo su && bundle exec rake story:default`
+    * or updating your `/etc/sudoers` file with `$USER ALL=(ALL) NOPASSWD:ALL`
 
 
 ## Usage

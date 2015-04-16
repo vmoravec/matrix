@@ -46,6 +46,25 @@ namespace :mkcloud do
     end
   end
 
+  desc "Install default proposal"
+  task :installproposal, [:story_name, :env] do |_, args|
+    detect_config(args) do |story|
+      mkcloud.exec!(
+        "proposal",
+        story.config
+      )
+    end
+  end
+
+  desc "Show the full path to mkcloud script"
+  task :binpath do
+    puts Matrix.root.join(
+      matrix.config["vendor_dir"],
+      Matrix::Mkcloud::SCRIPT_DIR,
+      Matrix::Mkcloud::COMMAND
+    )
+  end
+
   def with_utils
     include Matrix::Utils::Mkcloud
     yield
