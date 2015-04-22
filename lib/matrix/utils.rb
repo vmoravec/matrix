@@ -1,6 +1,18 @@
 module Matrix
   module Utils
+    module User
+      def sudo
+        Matrix.user.root? ? "" : "sudo "
+      end
+
+      def sudo?
+        !Matrix.user.root?
+      end
+    end
+
     module Mkcloud
+      include Utils::User
+
       LOSETUP_BIN = "/sbin/losetup"
       MODPROBE_BIN = "/sbin/modprobe"
       TEMP_DIR = "tmp/"
@@ -39,14 +51,6 @@ module Matrix
 
       def losetup *args
         command.exec!("#{sudo + LOSETUP_BIN} #{args.join(' ')}")
-      end
-
-      def sudo
-        Matrix.user.root? ? "" : "sudo "
-      end
-
-      def sudo?
-        !Matrix.user.root?
       end
 
       def detect_config! story_name, env

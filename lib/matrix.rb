@@ -4,17 +4,12 @@ require "cct"
 require "matrix/version"
 require "matrix/cct"
 require "matrix/config"
-require "matrix/dsl"
-require "matrix/story_task"
-require "matrix/runner_task"
-require "matrix/feature_task"
 require "matrix/utils"
+require "matrix/rake/dsl"
+require "matrix/tasks/story_task"
+require "matrix/tasks/runner_task"
+require "matrix/tasks/feature_task"
 require "matrix/local_command"
-
-#FIXME hackish mockish
-LocalUser = ::Cct::LocalUser
-BaseLogger = ::Cct::BaseLogger
-
 require "matrix/mkcloud"
 
 module Matrix
@@ -51,5 +46,17 @@ module Matrix
     def build_story_tasks!
       config["story"].each {|story| StoryTask.new(*story) }
     end
+
+    def load_tasks
+      Rake::TaskManager.record_task_metadata = true
+      Dir.glob(root.to_s + "/tasks/**/*.rake").each do |task|
+        load task
+      end
+    end
   end
+
+  class LocalUser  < ::Cct::LocalUser; end
+  class BaseLogger < ::Cct::BaseLogger; end
 end
+
+

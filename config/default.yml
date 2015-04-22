@@ -1,5 +1,5 @@
-automation:
-  git:
+git:
+  automation:
     url: github.com:suse-cloud/automation
     branch: master
 

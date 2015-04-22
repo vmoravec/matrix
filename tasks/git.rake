@@ -13,7 +13,7 @@ namespace :git do
     end
 
     def checkout_target
-      ENV['branch'] || matrix.config['automation']['git']['branch'] || 'master'
+      ENV['branch'] || matrix.config['git']['automation']['branch'] || 'master'
     end
 
     desc "Remove the old repo and clone it again"
@@ -24,7 +24,7 @@ namespace :git do
 
     desc "Fetch the remote"
     task :fetch do
-      puts "Fetching from url '#{matrix.config['automation']['git']['url']}'"
+      puts "Fetching from url '#{matrix.config['git']['automation']['url']}'"
       chdir(automation_repo) do
         system "git fetch origin"
       end
@@ -32,9 +32,9 @@ namespace :git do
 
     desc "Create a clone of automation repository"
     task :clone do
-      puts "Cloning from url '#{matrix.config['automation']['git']['url']}'"
+      puts "Cloning from url '#{matrix.config['git']['automation']['url']}'"
       chdir(matrix.config['vendor_dir']) do
-        system "git clone git@#{matrix.config['automation']['git']['url']}"
+        system "git clone git@#{matrix.config['git']['automation']['url']}"
       end
     end
 

@@ -31,15 +31,17 @@ story:
           password: crowbar
 
     runners: &runners
-      mkcloud:cleanup: no feature
-      mkcloud:prepare: no feature
-      mkcloud:setupadmin: no feature
+      mkcloud:cleanup:
+      mkcloud:prepare:
+      mkcloud:setupadmin:
       mkcloud:installcrowbar:
+        stage: Crowbar installed
         features: &admin
           admin:
 
-      mkcloud:installnodes: no feature
+      mkcloud:installnodes:
       mkcloud:installproposal:
+        stage: Controller node installed
         features:
           <<: *admin
           controller:
