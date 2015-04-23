@@ -33,7 +33,9 @@ story:
     runners: &runners
       mkcloud:cleanup:
       mkcloud:prepare:
+        stage: Init
       mkcloud:setupadmin:
+        stage:
       mkcloud:installcrowbar:
         stage: Crowbar installed
         features: &admin

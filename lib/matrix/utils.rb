@@ -1,8 +1,11 @@
 module Matrix
   module Utils
     module User
-      def sudo
-        Matrix.user.root? ? "" : "sudo "
+      def sudo *args
+        sudo_result = Matrix.user.root? ? "" : "sudo "
+        return sudo_result if args.empty?
+
+        sudo_result.empty? ? args : args.unshift(sudo_result)
       end
 
       def sudo?
@@ -10,66 +13,24 @@ module Matrix
       end
     end
 
-    module Mkcloud
-      include Utils::User
+    module Runner
+      def runner_config
+        if Matrix.config["current_runner"].nil?
+          include StoryDetection
 
-      LOSETUP_BIN = "/sbin/losetup"
-      MODPROBE_BIN = "/sbin/modprobe"
-      TEMP_DIR = "tmp/"
-      MANDATORY_CONF_KEYS = %w(
-        cloud
-        cloudpv
-        virtualcloud
-        cloudsource
-        net_public
-        net_fixed
-        net_admin
-        adminnetmask
-        networkingplugin
-      )
+          story_name = ENV["story"]
+          fail "Story not detected. Try to provide environment variable story=STORY_NAME"
 
-      def command
-        LocalCommand.new(logger: Matrix.logger)
-      end
-
-      def create_image story_name, size
-        path = story_file(story_name)
-        if File.exist?(path)
-          puts "Creating new filesystem in `#{path}"
-          create_filesystem(path)
-        else
-          puts "Creating image file in `#{path}"
-          command.exec!("qemu-img create -f raw #{path} #{size}")
-          create_filesystem(path)
-        end
-        path
-      end
-
-      def create_filesystem file
-        command.exec!("#{sudo} mkfs -t ext4 #{file}")
-      end
-
-      def losetup *args
-        command.exec!("#{sudo + LOSETUP_BIN} #{args.join(' ')}")
-      end
-
-      def detect_config! story_name, env
-        validate_base!
-
-        story_name = story_name || ENV["story"]
-        if story_name.nil?
-          abort "Story name not detected, mkcloud can't continue.." +
-                " Try with story=NAME "
+          config = detect_story(story_name)
+          Matrix.config["current_runner"] = config
         end
 
-        story_config, story_name = detect_story_config!(story_name, env)
-
-        update_config(story_config, story_name)
-
-        validate_mkcloud_config!(story_config)
-        [ story_config, story_name ]
+        yield Matrix.config["current_runner"]
       end
+    end
 
+    #TODO there is mkcloud specific stuff here, remove that
+    module StoryDetection
       def detect_story_config! name, config
         case config
         when nil
@@ -89,51 +50,30 @@ module Matrix
         end
       end
 
-      def story_file name
-        Matrix.root.join(TEMP_DIR, name + ".img").to_s
+      def detect_config! story_name, env
+        validate_base!
+
+        story_name = story_name || ENV["story"]
+        if story_name.nil?
+          abort "Story name not detected, mkcloud can't continue.." +
+                " Try with story=NAME "
+        end
+
+        story_config, story_name = detect_story_config!(story_name, env)
+
+        update_config(story_config, story_name)
+
+        validate_mkcloud_config!(story_config)
+        [ story_config, story_name ]
       end
+    end
 
-      alias_method :story_image, :story_file
-
-      def update_config config, story_name
-        log(:matrix).info "Updating story config: cloud => #{story_name}"
-        config["cloud"] = story_name
-        config["cloudpv"] = detect_loop_device(story_name) || find_available_loop_device
-        config["cloudbr"] = story_name + "-br"
-        config["virtualcloud"] = story_name
-        config
-      end
-
-      def detect_loop_device story_name
-        losetup("-j", story_file(story_name)).output.split(":").first
-      end
-
-      def find_available_loop_device
-        losetup("-f").output.strip
-      end
-
-      def detach_story_image story_name
-        device = detect_loop_device(story_name)
-        return unless device
-
-        losetup("-d", device)
-      end
-
+    module Validations
       def validate_base!
         if !Dir.exist?(matrix.config["vendor_dir"] + Matrix::Mkcloud::SCRIPT_DIR)
           abort "Missing automation repository. Try `rake git:automation:clone`"
         end
       end
-
-      def validate_mkcloud_config! config
-        MANDATORY_CONF_KEYS.each do |key|
-          if !config.keys.include?(key)
-            abort "Invalid mkcloud config, missing '#{key}' value"
-          end
-        end
-        config
-      end
-
     end
   end
 end

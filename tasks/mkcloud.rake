@@ -1,22 +1,23 @@
 namespace :mkcloud do
   desc "Cleanup leftovers from last run"
-  task :cleanup, [:story_name, :env] do |_, args|
-    detect_config(args) do |story|
-      mkcloud.exec! :cleanup, story.config
-      detach_story_image(story.name)
-    end
+  task :cleanup do
+    mkcloud.exec! :cleanup
   end
 
   desc "Prepare the environment for cloud installation"
-  task :prepare, [:story_name, :env] do |_, args|
-    detect_config(args) do |story|
-      create_image(story.name, story.config["lvm_size"])
-      configure_loop_device(story.name)
-      story.config["cloudpv"] = detect_loop_device(story.name)
-      log(:matrix).info "Preparing story '#{story.name}' with config:"
-      log(:matrix).info story.config.to_yaml
+  task :prepare do
       mkcloud.exec! :prepare, story.config
     end
+  end
+
+  desc "Install controller node"
+  task :install_control_node do
+    mkcloud.exec! :install_control_node, matrix.config["current_story"]
+  end
+
+  desc "Enable modprobe"
+  task :modprobe_loop do
+    virtsetup.modprobe_loop
   end
 
   desc "Setup admin node"

@@ -2,31 +2,21 @@ require 'rake/tasklib'
 
 module Matrix
   class StoryTask < ::Rake::TaskLib
-    attr_reader :name, :config, :runners
+    attr_reader :name, :config, :runners, :log
 
     def initialize name, config
       @name = name
       @config = config
-      Matrix.logger.debug("Using this story configuration: #{config.inspect}")
+      @log = Matrix.logger
+      log.debug("Using this story configuration: #{config.inspect}")
       @runners = config["runners"]
-      @stages = detect_stages
       @verbose = Matrix.verbose?
       define_tasks
     end
 
     private
 
-    def detect_stages
-      runners.map do |name, attributes|
-        #Stage.new(name,
-
-      end
-    end
-
-    def current_stage
-    end
-
-    def run_task name
+    def run_story name
       config["runners"]
       .map {|runner| RunnerTask.new(name, runner << config) }
       .each(&:invoke)
@@ -36,7 +26,13 @@ module Matrix
       namespace :story do
         namespace name do
           task :run  do
-            run_task(name)
+            run_story(name)
+          end
+
+          # Not using task desc on purpose
+          task :config do
+            require "awesome_print"
+            ap filter_story(name)
           end
 
           # Not showing task desc on purpose
@@ -46,27 +42,38 @@ module Matrix
 
           # Not showing task desc on purpose
           task :stages do
-            stages = {}
+            stages = []
             current_stage = nil
-            current_runners = []
-            config["runners"].each_pair do |key, values|
-              next if values.nil?#&& current_stage.nil?
-              next unless values["stage"]
-
-              current_stage = values["stage"] if current_stage != values["stage"]
-              current_runners = [] if key != current_stage
-
-              current_runner = key
-              #current_runners << current_runner
-
-              if values.is_a?(Hash) && values["features"]
-                abort "Missing stage name at #{key}" unless values["stage"]
-              #puts values.inspect
+            runners.each_pair do |runner_name, children|
+              if (children.nil? || children.empty?) && current_stage.nil?
+                stages << { "No stage" => [ runner_name, { features:{} } ] }
+                next
               end
-              current_stage = values["stage"] if values["stage"] || current_stage
-              current_runners << key if current_stage
 
-              stages[current_stage] = current_runners
+              if (children.nil? || children.empty?) && current_stage
+                stages << { current_stage => [ runner_name, {features: {}} ] }
+                warn_on_missing_features(current_stage, runner_name)
+                next
+              end
+
+              if (children.nil? || children.empty?)
+                stages << {"No stage" => [ runner_name, {features: {}} ] }
+                current_stage = nil
+                next
+              end
+
+              if children.has_key?("stage") && children["stage"].nil?
+                stages << {"No stage" => [ runner_name, { features: children["features"] || {}} ]}
+                current_stage = nil
+                next
+              end
+
+              if children["stage"]
+                stages << {children["stage"] => [ runner_name, {features: children["features"] || {}} ] }
+                current_stage = children["stage"]
+                warn_on_missing_features(current_stage, runner_name, children)
+                next
+              end
             end
             puts stages.inspect
           end
@@ -78,11 +85,7 @@ module Matrix
               next if features.nil?
 
               features = resolve_features(features)
-              if features.nil?
-                next
-              elsif features.empty?
-                next
-              end
+              next if features.nil? || features.empty?
               puts features
             end
           end
@@ -90,6 +93,24 @@ module Matrix
 
         desc config["desc"]
         task name => "story:#{name}:run"
+      end
+
+      # Nested method
+      def filter_story story
+        abort "No configuration found for any stories" if matrix.config["story"].nil?
+
+        result = matrix.config["story"][story]
+        abort "No configuration found for story '#{story}'" if result.nil?
+
+        puts "Showing config for story '#{story}':"
+        result
+      end
+
+      # Nested method
+      def warn_on_missing_features stage_name, runner_name, nodes={}
+        log.warn(
+        "Stage '#{stage_name}' in runner '#{runner_name}' has no features"
+        ) unless nodes["features"]
       end
 
       # Nested method

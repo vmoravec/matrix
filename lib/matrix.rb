@@ -2,15 +2,18 @@ require "pathname"
 
 require "cct"
 require "matrix/version"
+require "matrix/errors"
+require "matrix/base_logger"
 require "matrix/cct"
 require "matrix/config"
 require "matrix/utils"
+require "matrix/local_command"
 require "matrix/rake/dsl"
 require "matrix/tasks/story_task"
 require "matrix/tasks/runner_task"
 require "matrix/tasks/feature_task"
-require "matrix/local_command"
-require "matrix/mkcloud"
+require "matrix/runners/mkcloud"
+require "matrix/runners/virtsetup"
 
 module Matrix
   LOG_TAG = "MATRIX"
@@ -56,7 +59,6 @@ module Matrix
   end
 
   class LocalUser  < ::Cct::LocalUser; end
-  class BaseLogger < ::Cct::BaseLogger; end
 end
 
 

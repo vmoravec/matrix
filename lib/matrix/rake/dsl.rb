@@ -8,6 +8,10 @@ module Rake
       @mkcloud ||= Matrix::Mkcloud.new
     end
 
+    def virtsetup
+      @virtsetup ||= Matrix::Virtsetup.new
+    end
+
     def command
       Matrix.command
     end
