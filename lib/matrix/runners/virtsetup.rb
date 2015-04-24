@@ -1,64 +1,72 @@
 module Matrix
   class Virtsetup
 
+    LOG_TAG = "VIRTSETUP"
     LOSETUP_BIN = "/sbin/losetup"
     MODPROBE_BIN = "/sbin/modprobe"
     TEMP_DIR = "tmp/"
 
     include Utils::Runner
     include Utils::User
+    include Utils::StoryDetection
 
-    def detach_story_image
-      runner_config do |config|
-        device = detect_loop_device(config.story_name)
-        return unless device
+    attr_reader :environment, :story_name, :command
+    attr_reader :image_file, :image_size
 
-        losetup("-d", device)
-      end
+    def initialize
+      @story_name, @environment = detect_configuration
+      @command = LocalCommand.new(LOG_TAG)
+      @image_file = Matrix.root.join(TEMP_DIR, story_name + ".img").to_s
+      @image_size = environment["mkcloud"]["lvm_size"]
     end
 
-    def detect_loop_device story_name
-      losetup("-j", story_file(story_name)).output.split(":").first
+    def detach_story_image
+      device = detect_loop_device
+      return unless device
+
+      losetup("-d", device)
+    end
+
+    def detect_loop_device
+      losetup("-j", image_file).output.split(":").first
     end
 
     def modprobe_loop
       command.exec!(*sudo("modprobe loop"))
     end
 
-    def story_file name
-      Matrix.root.join(TEMP_DIR, name + ".img").to_s
-    end
-
-    def command
-      LocalCommand.new(logger: Matrix.logger)
-    end
-
-    def create_image story_name, size
-      path = story_file(story_name)
-      if File.exist?(path)
-        puts "Creating new filesystem in `#{path}"
-        create_filesystem(path)
+    def create_image
+      if File.exist?(image_file)
+        puts "Creating new filesystem in `#{image_file}"
+        create_filesystem
       else
-        puts "Creating image file in `#{path}"
-        command.exec!("qemu-img create -f raw #{path} #{size}")
-        create_filesystem(path)
+        puts "Creating image file in `#{image_file}"
+        command.exec!("qemu-img create -f raw #{image_file} #{image_size}")
+        create_filesystem
       end
-      path
+      environment["mkcloud"]["cloudpv"] = detect_loop_device
     end
 
-    def create_filesystem file
-      command.exec!("#{sudo} mkfs -t ext4 #{file}")
+    def create_filesystem
+      command.exec!("#{sudo} mkfs -t ext4 #{image_file}")
     end
 
     def losetup *args
       command.exec!("#{sudo + LOSETUP_BIN} #{args.join(' ')}")
     end
 
-    alias_method :story_image, :story_file
 
     def find_available_loop_device
       losetup("-f").output.strip
     end
 
+    def configure_loop_device
+      device_info = detect_loop_device
+      if device_info
+        abort "Image #{image_file} is already attached to #{device_info}"
+      else
+        losetup(find_available_loop_device, image_file)
+      end
+    end
   end
 end

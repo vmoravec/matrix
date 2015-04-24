@@ -17,8 +17,9 @@ module Matrix
     private
 
     def run_story name
+      main_config = config.reject {|k,v| k == "runners"}
       config["runners"]
-      .map {|runner| RunnerTask.new(name, runner << config) }
+      .map {|runner| RunnerTask.new(name, runner << main_config) }
       .each(&:invoke)
     end
 

@@ -7,11 +7,22 @@ namespace :virtsetup do
   desc "Create image"
   task :create_image do
     virtsetup.create_image
-    story.config["cloudpv"] = detect_loop_device(story.name)
+  end
+
+  desc "Enable kernel module 'loop'"
+  task :modprobe_loop do
+    virtsetup.modprobe_loop
   end
 
   desc "Configure loop device"
-  task :config_loop do
+  task :configure_loop_device do
     virtsetup.configure_loop_device
+  end
+
+  desc "Clear all loop devices"
+  task :detach_all do
+    include Matrix::Utils::User
+
+    command.exec!("#{sudo} losetup -D")
   end
 end

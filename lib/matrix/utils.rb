@@ -29,42 +29,20 @@ module Matrix
       end
     end
 
-    #TODO there is mkcloud specific stuff here, remove that
     module StoryDetection
-      def detect_story_config! name, config
-        case config
-        when nil
-          story = matrix.config["story"][name]
-          if story && story["mkcloud"]
-            [ story["mkcloud"], name ]
-          else
-            abort "Config for story '#{name}' not detected"
+      def detect_configuration
+        if Matrix.config.current_runner.nil?
+          story = ENV["story"]
+          if story.nil?
+            raise "Story name not found. For standalone runner provide 'story=NAME'"
           end
-        when Hash
-          story = config["mkcloud"]
-          if story
-            [ story, name ]
-          else
-            abort "Story configuration not found"
-          end
+
+          config = Matrix.config["story"][story]
+          raise "Configuration for story '#{story}' not found" unless config
+
+          return [ story, config.reject {|k,v| k == "runners"} ]
         end
-      end
-
-      def detect_config! story_name, env
-        validate_base!
-
-        story_name = story_name || ENV["story"]
-        if story_name.nil?
-          abort "Story name not detected, mkcloud can't continue.." +
-                " Try with story=NAME "
-        end
-
-        story_config, story_name = detect_story_config!(story_name, env)
-
-        update_config(story_config, story_name)
-
-        validate_mkcloud_config!(story_config)
-        [ story_config, story_name ]
+        Matrix.config.current_runner
       end
     end
 

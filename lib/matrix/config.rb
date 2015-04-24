@@ -17,6 +17,8 @@ module Matrix
 
     attr_reader :raw
 
+    attr_accessor :current_runner
+
     def initialize
       @dir = Matrix.root.join(DIR)
       @files = []
@@ -31,7 +33,7 @@ module Matrix
     def [](config_value)
       return content[config_value] if content[config_value]
 
-      abort "Your current config does not include root element '#{config_value}'"
+      fail "Your current config does not include root element '#{config_value}'"
     end
 
     def merge! filename

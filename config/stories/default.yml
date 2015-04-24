@@ -32,10 +32,11 @@ story:
 
     runners: &runners
       mkcloud:cleanup:
+      virtsetup:detach_image:
+      virtsetup:create_image:
+      virtsetup:configure_loop_device:
       mkcloud:prepare:
-        stage: Init
       mkcloud:setupadmin:
-        stage:
       mkcloud:installcrowbar:
         stage: Crowbar installed
         features: &admin
@@ -48,9 +49,9 @@ story:
           <<: *admin
           controller:
 
-  default:openswitch:
+  default:openvswitch:
     <<: *default
-    desc: Default setup for virtual deployment with openswitch as network plugin
+    desc: Default setup for virtual deployment with openvswitch as network plugin
     mkcloud:
       <<: *mkcloud
       networkingplugin: openswitch
