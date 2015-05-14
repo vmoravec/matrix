@@ -24,7 +24,6 @@ module Matrix
       @files = []
       @raw = ""
       @content = load_default_config
-      load_cct_config
       load_story_configs
       #TODO: Still missing
       load_env_config
@@ -51,14 +50,9 @@ module Matrix
         abort "Default config file in '#{default_config}' not found"
       end
       files << default_config
-      load_content(default_config.to_s)
-    end
-
-    def load_cct_config
-      content["cct"].each do |cct_file|
-        next unless File.exist?(dir.join(cct_file))
-        merge!(cct_file)
-      end
+      content = load_content(default_config.to_s)
+      content["vendor_dir"] = "vendor/"
+      content
     end
 
     # Assuming the default config file is already loaded in #content

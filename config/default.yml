@@ -3,11 +3,25 @@ git:
     url: github.com:suse-cloud/automation
     branch: master
 
-vendor_dir: "vendor/"
-
 stories:
   - default.yml
-  - ceph.yml
+# - ceph.yml
 
-cct:
-  - cct.yml
+infra:
+  qa2:
+    gate: gate.cloud2adm.qa.suse.de
+    user: root
+    password:
+    admin_node:
+      ip: 10.162.24.10
+      fqdn: crowbar.cloud2adm.qa.suse.de
+      libvirt_domain: crowbar2
+
+  qa3:
+    gate: gate.cloud3adm.qa.suse.de
+    user: root
+    password:
+    admin_node:
+      ip: 10.162.24.10
+      fqdn: crowbar.cloud3adm.qa.suse.de
+      libvirt_domain: crowbar3

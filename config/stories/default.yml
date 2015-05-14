@@ -1,58 +1,93 @@
 ---
 story:
-  default: &default
-    desc: Default setup for virtual deployment with linuxbridge as network plugin
-    ignore_features: <%= ENV['ignore_features'] || false %>
-    mkcloud: &mkcloud
-      cloudsource: <%= ENV['cloudsource'] || 'develcloud5' %>
-      net_public: 192.168.173
-      net_fixed: 192.168.174
-      net_admin: 192.168.175
-      adminnetmask: 255.255.248.0
-      TESTHEAD: <%= ENV['TESTHEAD'] || 1 %>
-      UPDATEREPOS: <%= ENV['UPDATEREPOS'] || 1 %>
-      nodenumber: <%= ENV['nodenumber'] || 3 %>
-      networkingplugin: <%= ENV['networkingplugin'] || 'linuxbridge' %>
-      compute_node_memory: <%= ENV['compute_node_memory'] || 4194304 %>
-      lvm_size: <%= ENV['lvm_size'] || '160G' %>
-      computenode_hdd_size: <%= ENV['computenode_hdd_size'] || '20G' %>
-      controller_hdd_size: <%= ENV['controller_hdd_size'] || '40G' %>
+  default:
+    qa2: &qa2
+      desc: Default setup for qa2 cloud with linuxbridge as network plugin
+      ignore_features: <%= ENV['ignore_features'] || false %>
+      mkcloud: &mkcloud
+        cloudsource: <%= ENV['cloudsource'] || 'GM5+up' %>
+        TESTHEAD: <%= ENV['TESTHEAD'] || 1 %>
+        UPDATEREPOS: <%= ENV['UPDATEREPOS'] || 1 %>
+        networkingplugin: <%= ENV['networkingplugin'] || 'linuxbridge' %>
+
+      cct:
+        admin_node: &admin_node
+          ssh:
+            user: root
+            password: linux
+          api:
+            user: crowbar
+            password: crowbar
+
+      runners: &runners
+        qa_crowbarsetup:prepareinstallcrowbar:
+        qa_crowbarsetup:installcrowbar:
+          stage: Crowbar installed
+          features:
+            admin:
+
+        qa_crowbarsetup:allocate:
+        qa_crowbarsetup:waitcompute:
+        qa_crowbarsetup:proposal:
+          stage: Controller node installed
+          features:
+            admin:
+            controller:
+    qa3:
+      <<: *qa2
+      desc: Default setup for qa3 cloud with linuxbridge as network plugin
+
+      cct:
+        admin_node:
+          <<: *admin_node
 
 
-    cct:
-      admin_node:
-        ip: 192.168.175.10
-        ssh:
-          user: root
-          password: linux
+    virtual:
+      <<: *qa2
+      desc: Default setup for virtual cloud with linuxbridge as network plugin
+      mkcloud:
+        <<: *mkcloud
+        net_public: 192.168.173
+        net_fixed: 192.168.174
+        net_admin: 192.168.175
+        adminnetmask: 255.255.248.0
+        nodenumber: <%= ENV['nodenumber'] || 3 %>
+        networkingplugin: <%= ENV['networkingplugin'] || 'linuxbridge' %>
+        compute_node_memory: <%= ENV['compute_node_memory'] || 4194304 %>
+        lvm_size: <%= ENV['lvm_size'] || '160G' %>
+        computenode_hdd_size: <%= ENV['computenode_hdd_size'] || '20G' %>
+        controller_hdd_size: <%= ENV['controller_hdd_size'] || '40G' %>
 
-        api:
-          user: crowbar
-          password: crowbar
+      cct:
+        admin_node:
+          <<: *admin_node
+          ip: 192.168.175.10
 
-    runners: &runners
-      mkcloud:cleanup:
-      virtsetup:detach_image:
-      virtsetup:create_image:
-      virtsetup:configure_loop_device:
-      mkcloud:prepare:
-      mkcloud:setupadmin:
-      mkcloud:installcrowbar:
-        stage: Crowbar installed
-        features: &admin
-          admin:
+      runners:
+        mkcloud:cleanup:
+        virtsetup:detach_image:
+        virtsetup:create_image:
+        virtsetup:configure_loop_device:
+        mkcloud:prepare:
+        mkcloud:setupadmin:
+        mkcloud:installcrowbar:
+          stage: Crowbar installed
+          features: &admin
+            admin:
 
-      mkcloud:installnodes:
-      mkcloud:installproposal:
-        stage: Controller node installed
-        features:
-          <<: *admin
-          controller:
+        mkcloud:installnodes:
+        mkcloud:installproposal:
+          stage: Controller node installed
+          features:
+            <<: *admin
+            controller:
+
 
   default:openvswitch:
-    <<: *default
-    desc: Default setup for virtual deployment with openvswitch as network plugin
-    mkcloud:
-      <<: *mkcloud
-      networkingplugin: openswitch
+    qa2:
+      <<: *qa2
+      desc: Default setup for virtual deployment with openvswitch as network plugin
+      mkcloud:
+        <<: *mkcloud
+        networkingplugin: openswitch
 
