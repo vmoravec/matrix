@@ -2,6 +2,37 @@
 
 __`Story runner for cloud testsuite`__
 
+## Todos
+
+* timeout and counter + progress bar
+  Every runner or feature has a timeout of 5-10 minutes by default. 
+  The counter will expect parameters in seconds to update the progress bar
+  Real elapsed time and timeout will be attributes of every feature or runner object
+  together with time start and time end plus result of the command.
+  Use something like this: http://stackoverflow.com/questions/15892738/perform-a-loop-for-a-certain-time-interval-or-while-condition-is-met
+  On the start of every command, the progress bar will show:
+    - stage/checkpoint to be reached
+    - timeout to finish
+    - when the command exits (with success or failure), the progress bar will change and reflect that change
+    - all these events will be captured into the structured output
+
+* output analyser for remote and local command
+  If the analyser mixed into a class, it will provide an interface
+  to register regexps with types (start, end, checkpoint, result ...) and descriptions for the successful match.
+  Will scan every single line of the command to interpret it
+  Maybe a separate configuration file would be practical (idea)
+
+* runners' and features' progress data capture engine to measure:
+  time elapsed
+  time started
+  stage achieved
+  stage result
+  timeout for stage
+  tiemout for runners and features
+  ...
+
+
+
 ## Quick start
 
   1.  Check [system dependencies](#dependencies)

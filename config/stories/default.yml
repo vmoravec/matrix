@@ -19,18 +19,21 @@ story:
             user: crowbar
             password: crowbar
 
+      # default timeout will be 5 or 10 minutes
       runners: &runners
         qa_crowbarsetup:prepareinstallcrowbar:
         qa_crowbarsetup:installcrowbar:
+          timeout: "10 minutes"
           stage: Crowbar installed
           features:
             admin:
 
         qa_crowbarsetup:allocate:
+          stage: Nodes allocated
         qa_crowbarsetup:waitcompute:
         qa_crowbarsetup:proposal:
-          stage: Controller node installed
           timeout: "30 minutes"
+          stage: Controller node installed
           features:
             admin:
             controller:
