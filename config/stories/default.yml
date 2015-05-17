@@ -30,6 +30,7 @@ story:
         qa_crowbarsetup:waitcompute:
         qa_crowbarsetup:proposal:
           stage: Controller node installed
+          timeout: "30 minutes"
           features:
             admin:
             controller:

@@ -2,14 +2,17 @@ require 'rake/tasklib'
 
 module Matrix
   class StoryTask < ::Rake::TaskLib
-    attr_reader :name, :config, :runners, :log
+    attr_reader :name, :config, :runners, :log, :targets, :current_target
 
     def initialize name, config
       @name = name
       @config = config
+      @targets = config.keys
+      @current_target = ENV["target"]
+
       @log = Matrix.logger
       log.debug("Using this story configuration: #{config.inspect}")
-      @runners = config["runners"]
+      @runners = config[current_target]["runners"]
       @verbose = Matrix.verbose?
       define_tasks
     end
@@ -17,10 +20,17 @@ module Matrix
     private
 
     def run_story name
-      main_config = config.reject {|k,v| k == "runners"}
-      config["runners"]
-      .map {|runner| RunnerTask.new(name, runner << main_config) }
-      .each(&:invoke)
+      abort "Target for story '#{name}' not provided" unless current_target
+
+      runners = config[current_target]["runners"]
+      abort "No runners defined for story '#{name}'" if runners.nil?
+
+      main_config = config[current_target].reject {|k,v| k == "runners"}
+      runners.map {|runner| RunnerTask.new(name, runner << main_config)}.each(&:invoke)
+    end
+
+    def fail!
+      abort "Target for story '#{name}' not provided" unless current_target
     end
 
     def define_tasks
@@ -39,6 +49,11 @@ module Matrix
           # Not showing task desc on purpose
           task :runners do
             puts runners.keys
+          end
+
+          # Not showing task desc on purpose
+          task :targets do
+            puts targets
           end
 
           # Not showing task desc on purpose
