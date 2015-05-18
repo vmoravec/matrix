@@ -2,15 +2,17 @@ module Matrix
   class RunnerTask
     attr_reader :features, :feature_tasks, :runner_name, :log, :environment, :story_name
     attr_reader :ignore_features
+    attr_reader :target
 
     # @params [String, Array<String, Hash|String|nil, Hash>]
     #
     #   @Example:
     #
-    #   ["mkcloud:cleanup", {"features" => {"admin" => nil}}, {"mkcloud"=> {...}}]
-    def initialize story_name, config
+    #   ["mkcloud:cleanup", "qa2", {"features" => {"admin" => nil}}, {"mkcloud"=> {...}}]
+    def initialize story_name, target, config
       @ignore_features = !!ENV["ignore_features"]
       @story_name = story_name
+      @target = target
       @log = Matrix.logger
       @runner_name, features, @environment = config
       return if ignore_features?

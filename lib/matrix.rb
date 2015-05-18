@@ -1,4 +1,6 @@
 require "pathname"
+require "net/ssh"
+require "net/ssh/gateway"
 
 require "cct"
 require "matrix/version"
@@ -8,6 +10,7 @@ require "matrix/cct"
 require "matrix/config"
 require "matrix/utils"
 require "matrix/local_command"
+require "matrix/remote_command"
 require "matrix/rake/dsl"
 require "matrix/tasks/story_task"
 require "matrix/tasks/runner_task"
@@ -23,7 +26,7 @@ module Matrix
   class << self
     attr_reader :root, :user, :logger, :config, :hostname, :log_path, :cct, :command
 
-    def setup root_dir, logger: nil, verbose: false, log_path: nil
+    def configure root_dir, logger: nil, verbose: false, log_path: nil
       @verbose = verbose == true
       @root = Pathname.new(root_dir)
       @config = Config.new
@@ -50,9 +53,10 @@ module Matrix
       config["story"].each {|story| StoryTask.new(*story) }
     end
 
-    def load_tasks
+    def load_tasks subdir=nil
+      path = subdir ? "/tasks/#{subdir}/*.rake" : "/tasks/*.rake"
       Rake::TaskManager.record_task_metadata = true
-      Dir.glob(root.to_s + "/tasks/**/*.rake").each do |task|
+      Dir.glob(root.to_s + path).each do |task|
         load task
       end
     end

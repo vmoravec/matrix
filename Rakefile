@@ -7,6 +7,5 @@ RSpec::Core::RakeTask.new(:spec)
 
 require "matrix"
 
-Matrix.setup(__dir__, verbose: verbose)
+Matrix.configure(__dir__, verbose: verbose)
 Matrix.load_tasks
-Matrix.build_story_tasks!

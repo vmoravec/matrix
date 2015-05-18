@@ -21,6 +21,7 @@ story:
 
       # default timeout will be 5 or 10 minutes
       runners: &runners
+        qa2:setup:prepare_admin_node:
         qa_crowbarsetup:prepareinstallcrowbar:
         qa_crowbarsetup:installcrowbar:
           timeout: "10 minutes"
