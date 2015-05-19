@@ -1,13 +1,10 @@
-namespace :targets do
-  task :list do
-    Matrix.load_tasks("targets")
-    Rake.application.options.show_tasks = :tasks
-    Rake.application.options.show_task_pattern = /target:/
-    Rake.application.display_tasks_and_comments
+namespace :target do
+  namespace :qa2 do
+    task :gate do
+      puts "SSH to gate qa2"
+    end
   end
+
+  desc "Test availability of qa2 gate"
+  task :qa2 => "qa2:gate"
 end
-
-desc "List all targets to deploy cloud on"
-task :targets => "targets:list"
-
-

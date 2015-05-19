@@ -9,3 +9,4 @@ require "matrix"
 
 Matrix.configure(__dir__, verbose: verbose)
 Matrix.load_tasks
+Matrix.build_story_tasks!
