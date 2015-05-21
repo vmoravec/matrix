@@ -5,6 +5,11 @@ namespace :target do
     end
   end
 
-  desc "Test availability of qa2 gate"
+  desc "Test availability of qa2 cluster"
   task :qa2 => "qa2:gate"
+end
+
+desc "List all targets"
+task :targets do
+  puts Matrix.targets.map(&:name)
 end

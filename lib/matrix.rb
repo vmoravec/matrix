@@ -7,6 +7,8 @@ require "matrix/version"
 require "matrix/errors"
 require "matrix/base_logger"
 require "matrix/cct"
+require "matrix/admin_node"
+require "matrix/target"
 require "matrix/config"
 require "matrix/utils"
 require "matrix/local_command"
@@ -25,6 +27,7 @@ module Matrix
 
   class << self
     attr_reader :root, :user, :logger, :config, :hostname, :log_path, :cct, :command
+    attr_reader :targets
 
     def configure root_dir, logger: nil, verbose: false, log_path: nil
       @verbose = verbose == true
@@ -38,6 +41,7 @@ module Matrix
       ).base
       @command = LocalCommand.new("MATRIX", logger: @logger)
       @cct = Matrix::Cct.new(verbose?,root.join(LOG_DIR, ::Cct::LOG_FILENAME).expand_path)
+      @targets = config["targets"].keys.map {|name| Target.new(name, config["targets"][name]) }
       self
     end
 
