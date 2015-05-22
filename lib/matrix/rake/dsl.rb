@@ -16,5 +16,9 @@ module Rake
       Matrix.command
     end
 
+    def targets
+      Matrix.targets
+    end
+
   end
 end

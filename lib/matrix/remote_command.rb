@@ -20,9 +20,10 @@ module Matrix
       validate_options
     end
 
-    def exec! command, params=[]
+    def exec! command, *params
       connect!
       host_ip = gateway ? target.ip : options.ip
+      params = params.flatten
       environment = set_environment(params)
       full_command = "#{command} #{params.join(" ")}".strip
       result = Result.new(false, "", 1000, host_ip)
@@ -142,7 +143,7 @@ module Matrix
       options.ip = opts['ip'] || opts[:ip]
       options.user = opts['user'] || opts[:user]
       options.environment = opts['env'] || opts['environment'] || opts [:env] || {}
-      options.extended = EXTENDED_OPTIONS
+      options.extended = EXTENDED_OPTIONS.dup
       options.extended.logger = log
       options.extended.port = opts['port'] || opts[:port] if opts['port'] || opts[:port]
       options.extended.password = opts['password'] || opts[:password]
@@ -151,7 +152,7 @@ module Matrix
 
     def detect_timeout opts={}
       timeout = TIMEOUT
-      timeout = Cct.config['timeout']['ssh'] ? Cct.config['timeout']['ssh'] : timeout
+      timeout = Matrix.config['timeout']['ssh'] ? Matrix.config['timeout']['ssh'] : timeout
       timeout = opts['timeout'] || opts[:timeout] || timeout
       timeout.to_i
     end

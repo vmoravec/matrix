@@ -1,22 +1,80 @@
 module Matrix
+  class Targets
+    extend Forwardable
+
+    def_delegators :@targets, :map
+
+    attr_reader :targets
+
+    def initialize config
+      @targets = config["targets"].keys.map do |name|
+        Target.new(name, config["targets"][name])
+      end
+    end
+
+    def find target_name
+      targets.find {|t| t.name == target_name.to_s }
+    end
+  end
+
   class Target
-    attr_reader :name
+    attr_reader :name, :desc, :gate, :admin_node
 
     def initialize name, options
       @name = name
+      @desc = options["desc"]
       @gate = Gate.new(options["gate"]) if options["gate"]
       @admin_node = AdminNode.new(options["admin_node"])
     end
 
+    def verify!
+      gate.verify!
+    end
+
     class Gate
-      attr_reader :ip, :fqdn, :user, :password
+      attr_reader :ip, :fqdn, :user, :password, :domain, :command
 
       def initialize params
         @ip = params["ip"]
         @fqdn = params["fqdn"]
         @user = params["user"]
         @password = params["password"]
-        @admin_domain = params["admin_domain"]
+        @domain = params["admin_domain"]
+        @command = RemoteCommand.new(
+          ip: ip || fqdn, user: user, password: password
+        )
+      end
+
+      def exec! *params
+        command.exec!(*params)
+      end
+
+    end
+
+    def inspect
+      if gate
+      <<output
+Description: #{desc}
+Gate:
+  Fqdn:     #{gate.fqdn}
+  Login:    #{gate.user}
+  Password: #{gate.password}
+  Domain:   #{gate.domain}
+Admin node:
+  Ip:       #{admin_node.ip}
+  Fqdn:     #{admin_node.fqdn}
+  User:     #{admin_node.user}
+  Password: #{admin_node.password}
+output
+      else
+        <<output
+Description: #{desc}
+Admin node:
+  Ip:       #{admin_node.ip}
+  Fqdn:     #{admin_node.fqdn}
+  User:     #{admin_node.user}
+  Password: #{admin_node.password}
+output
       end
     end
 

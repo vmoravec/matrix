@@ -11,7 +11,7 @@ module Matrix
     def exec! command_name, *args
       command = "#{command_name} #{args.join(" ")}".strip
       log.info("Running command `#{command}`")
-      result = Result.new(false, "", 1000, "maanacor")
+      result = Result.new(false, "", 1000, Matrix.hostname)
 
       IO.popen(command, :err=>[:child, :out]) do |lines|
         lines.each do |line|

@@ -4,7 +4,7 @@ task :console do
 
   ARGV.clear
   Matrix.update_logger(Cct::BaseLogger.new('console', stdout: true))
-  cct.log.info "Starting console (irb session)" 
+  matrix.log.info "Starting console (irb session)" 
 
   IRB.start(__FILE__)
 end

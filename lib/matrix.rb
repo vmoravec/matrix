@@ -41,7 +41,7 @@ module Matrix
       ).base
       @command = LocalCommand.new("MATRIX", logger: @logger)
       @cct = Matrix::Cct.new(verbose?,root.join(LOG_DIR, ::Cct::LOG_FILENAME).expand_path)
-      @targets = config["targets"].keys.map {|name| Target.new(name, config["targets"][name]) }
+      @targets = Targets.new(config)
       self
     end
 

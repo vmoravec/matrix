@@ -9,22 +9,24 @@ stories:
 
 targets:
   qa2:
+    desc: Cloud 2 in rack 19 in serverroom 2
     gate:
       fqdn: gate.cloud2adm.qa.suse.de
       user: root
-      password:
+      password: linux
       admin_domain: crowbar2
     admin_node:
       ip: 10.162.24.10
       fqdn: crowbar.cloud2adm.qa.suse.de
       user: root
-      password:
+      password: linux
 
   qa3:
+    desc: Cloud 3 in rack 19 in serverroom 2
     gate:
       fqdn: gate.cloud3adm.qa.suse.de
       user: root
-      password:
+      password: linux
       admin_domain: crowbar3
     admin_node:
       ip: 10.162.24.10
@@ -33,7 +35,12 @@ targets:
       password:
 
   virtual:
+    desc: Virtualized environment using libvirt
     admin_node:
       ip: 192.168.175.10
       user: root
       password:
+
+
+timeout:
+  ssh: 5
