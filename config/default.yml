@@ -36,8 +36,13 @@ targets:
 
   virtual:
     desc: Virtualized environment using libvirt
+    gate:
+      fqdn: manacor.suse.cz
+      user: vmoravec
+      port: 22
+      key: ~/.shh/rsa_id.pub
     admin_node:
-      ip: 192.168.175.10
+      ip: 192.168.185.10
       user: root
       password:
 

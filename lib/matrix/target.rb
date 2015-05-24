@@ -24,7 +24,7 @@ module Matrix
       @name = name
       @desc = options["desc"]
       @gate = Gate.new(options["gate"]) if options["gate"]
-      @admin_node = AdminNode.new(options["admin_node"])
+      @admin_node = AdminNode.new(options.merge("gate" => gate))
     end
 
     def verify!
@@ -35,6 +35,7 @@ module Matrix
       attr_reader :ip, :fqdn, :user, :password, :domain, :command
 
       def initialize params
+        @gate = params["gate"]
         @ip = params["ip"]
         @fqdn = params["fqdn"]
         @user = params["user"]

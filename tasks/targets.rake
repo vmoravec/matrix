@@ -12,7 +12,7 @@ namespace :target do
   def rescue_from_failure
     yield
   rescue => e
-    puts "Failing..."
+    puts "   Failed."
     abort e.message
   end
 
@@ -68,27 +68,49 @@ namespace :target do
       puts target.inspect
     end
 
-    if target.gate
-      desc "Test connection to the gate for virtual target"
-      task :test do
-      end
-    end
-
-    desc "Details about the virtual target"
+    desc "Test connection to the virtual target"
     task :test do
-      puts "Testing ping to admin node..."
-      ping = "ping -q -c 1 -W 5 #{target.admin_node.ip || target.admin_node.fqdn}"
-      puts "#{ping}"
-      rescue_from_failure do
-        command.exec!(ping)
-      end
+      if target.gate
+        print "Testing ping to the gate at #{target.gate.ip || target.gate.fqdn}: "
+        ping = "ping -q -c 1 -W 5 #{target.gate.ip || target.gate.fqdn}"
+        print "#{ping}"
+        rescue_from_failure do
+          command.exec!(ping)
+        end
+        puts "    Success!"
 
-      puts "Testing ssh into the admin node"
-      rescue_from_failure do
-        target.admin_node.exec!("echo 'This is a test'")
+        print "Testing ping to admin node through gate at #{target.gate.ip || target.gate.fqdn}: "
+        ping = "ping -q -c 1 -W 5 #{target.admin_node.ip || target.admin_node.fqdn}"
+        print "#{ping}"
+        rescue_from_failure do
+          target.gate.exec!(ping)
+        end
+        puts "    Success!"
+
+        print "Testing ssh into the gate..."
+        rescue_from_failure do
+          target.gate.exec!("echo 'This is a test'")
+        end
+        puts "    Success!"
+      else
+        desc "Details about the virtual target"
+        task :test do
+          print "Testing ping to admin node: "
+          ping = "ping -q -c 1 -W 5 #{target.admin_node.ip || target.admin_node.fqdn}"
+          print "#{ping}"
+          rescue_from_failure do
+            command.exec!(ping)
+          end
+          puts "    Success!"
+
+          print "Testing ssh into the admin node"
+          rescue_from_failure do
+            target.admin_node.exec!("echo 'This is a test'")
+          end
+          puts "    Success!"
+          puts "Connection test for admin node in target 'virtual' has been successful"
+        end
       end
-      puts "Connection test for admin node in target 'virtual' has been successful"
     end
-
   end
 end
