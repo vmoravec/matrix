@@ -5,15 +5,13 @@ git:
 
 stories:
   - default.yml
-# - ceph.yml
 
 targets:
   qa2:
-    desc: Cloud 2 in rack 19 in serverroom 2
+    desc: Cloud 2 in rack 19 in server room 2
     gate:
       fqdn: gate.cloud2adm.qa.suse.de
       user: root
-      password: linux
       admin_domain: crowbar2
     admin_node:
       ip: 10.162.24.10
@@ -22,11 +20,10 @@ targets:
       password: linux
 
   qa3:
-    desc: Cloud 3 in rack 19 in serverroom 2
+    desc: Cloud 3 in rack 19 in server room 2
     gate:
       fqdn: gate.cloud3adm.qa.suse.de
       user: root
-      password: linux
       admin_domain: crowbar3
     admin_node:
       ip: 10.162.24.10
@@ -40,9 +37,8 @@ targets:
       fqdn: manacor.suse.cz
       user: vmoravec
       port: 22
-      key: ~/.shh/rsa_id.pub
     admin_node:
-      ip: 192.168.185.10
+      ip: CAN'T BE BLANK
       user: root
       password:
 

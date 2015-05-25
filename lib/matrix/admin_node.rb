@@ -3,10 +3,11 @@ module Matrix
     attr_reader :ip, :user, :password, :fqdn, :command
 
     def initialize options
-      @ip = options["ip"]
-      @user = options["user"]
-      @password = options["password"]
-      @fqdn = options["fqdn"]
+      config = options["admin_node"]
+      @ip = config["ip"]
+      @fqdn = config["fqdn"]
+      @user = config["user"]
+      @password = config["password"]
       @command = RemoteCommand.new(
         ip: ip || fqdn, user: user, password: password
       )
