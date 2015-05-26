@@ -58,14 +58,13 @@ module Matrix
 Description: #{desc}
 Gate:
   Fqdn:     #{gate.fqdn}
-  Login:    #{gate.user}
-  Password: #{gate.password}
+  User:     #{gate.user}
   Domain:   #{gate.domain}
 Admin node:
   Ip:       #{admin_node.ip}
   Fqdn:     #{admin_node.fqdn}
   User:     #{admin_node.user}
-  Password: #{admin_node.password}
+  Password: #{admin_node.password || '(none)'}
 output
       else
         <<output
@@ -74,7 +73,7 @@ Admin node:
   Ip:       #{admin_node.ip}
   Fqdn:     #{admin_node.fqdn}
   User:     #{admin_node.user}
-  Password: #{admin_node.password}
+  Password: #{admin_node.password || '(none)'}
 output
       end
     end

@@ -5,7 +5,7 @@ story:
       desc: Default setup for qa2 cloud with linuxbridge as network plugin
       ignore_features: <%= ENV['ignore_features'] || false %>
       mkcloud: &mkcloud
-        cloudsource: <%= ENV['cloudsource'] || 'GM5+up' %>
+        cloudsource: <%= ENV['cloudsource'] || 'develcloud6' %>
         TESTHEAD: <%= ENV['TESTHEAD'] || 1 %>
         UPDATEREPOS: <%= ENV['UPDATEREPOS'] || 1 %>
         networkingplugin: <%= ENV['networkingplugin'] || 'linuxbridge' %>
@@ -86,13 +86,3 @@ story:
           features:
             <<: *admin
             controller:
-
-
-  default:openvswitch:
-    qa2:
-      <<: *qa2
-      desc: Default setup for virtual deployment with openvswitch as network plugin
-      mkcloud:
-        <<: *mkcloud
-        networkingplugin: openswitch
-

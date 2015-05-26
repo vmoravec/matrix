@@ -8,7 +8,7 @@ stories:
 
 targets:
   qa2:
-    desc: Cloud 2 in rack 19 in server room 2
+    desc: "Cloud 2 in rack 19 in server room 2"
     gate:
       fqdn: gate.cloud2adm.qa.suse.de
       user: root
@@ -20,7 +20,7 @@ targets:
       password: linux
 
   qa3:
-    desc: Cloud 3 in rack 19 in server room 2
+    desc: "Cloud 3 in rack 19 in server room 2"
     gate:
       fqdn: gate.cloud3adm.qa.suse.de
       user: root
