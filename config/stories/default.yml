@@ -4,6 +4,11 @@ story:
     qa2: &qa2
       desc: Default setup for qa2 cloud with linuxbridge as network plugin
       ignore_features: <%= ENV['ignore_features'] || false %>
+      nodes:
+        - host: d00-25-90-e5-04-54
+          alias: dashboard
+          role: controller
+
       mkcloud: &mkcloud
         cloudsource: <%= ENV['cloudsource'] || 'develcloud6' %>
         TESTHEAD: <%= ENV['TESTHEAD'] || 1 %>
@@ -21,23 +26,35 @@ story:
 
       # default timeout will be 5 or 10 minutes
       runners: &runners
-        qa2:setup:prepare_admin_node:
-        qa_crowbarsetup:prepareinstallcrowbar:
-        qa_crowbarsetup:installcrowbar:
-          timeout: "10 minutes"
-          stage: Crowbar installed
-          features:
-            admin:
+        - config_gate:prepare_admin_node
+        - qa_crowbarsetup:prepareinstallcrowbar:
+            timeout: 2 minutes
+        - qa_crowbarsetup:installcrowbar:
+            timeout: "10 minutes"
+            stage: Crowbar installed
+            features:
+              - admin
 
         qa_crowbarsetup:allocate:
           stage: Nodes allocated
         qa_crowbarsetup:waitcompute:
-        qa_crowbarsetup:proposal:
-          timeout: "30 minutes"
-          stage: Controller node installed
-          features:
-            admin:
-            controller:
+        crowbar:batch:proposal:
+          - database:
+              stage: "Database barclamp installed"
+              timeout: 5 minutes
+          - nova:
+              timeout: "30 minutes"
+              stage: Controller node installed
+              features:
+                - admin
+                - controller
+
+          - tempest:
+              timeout: 20 minutes
+              stage: Tempest proposal installed
+              features:
+                - tempest
+
     qa3:
       <<: *qa2
       desc: Default setup for qa3 cloud with linuxbridge as network plugin
