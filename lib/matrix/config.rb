@@ -6,7 +6,8 @@ module Matrix
     DIR = "config/"
     STORIES_DIR = "stories/"
     DEFAULT_FILE = 'default.yml'
-    DEFAULT_STORY = 'default.yml'
+    DEFAULT_STORY_DIR = 'default'
+    STORY_FILE = "story.yml"
     EXT = '.yml'
 
     attr_reader :content
@@ -57,16 +58,20 @@ module Matrix
 
     # Assuming the default config file is already loaded in #content
     def load_story_configs
-      load_default_story
-      content['stories'].reject {|s| s == DEFAULT_STORY }.each do |story|
-        files << dir.join(STORIES_DIR, story).to_s
-        load_raw_story(story)
+      config_dir = dir.join(STORIES_DIR)
+      load_default_story(config_dir)
+      Dir.glob(config_dir.join("*")).each do |story_dir|
+        next if story_dir.end_with?("/default")
+
+        story_config = Pathname.new(story_dir).join(STORY_FILE)
+        files << story_config.to_s
+        load_raw_story(story_config.to_s)
       end
       content.deep_merge!(validate_yaml(raw))
     end
 
-    def load_default_story
-      default_file = dir.join(STORIES_DIR, DEFAULT_STORY)
+    def load_default_story config_dir
+      default_file = config_dir.join(DEFAULT_STORY_DIR, STORY_FILE)
       raw << File.read(default_file).to_s
       files << default_file
       validate_yaml(raw)

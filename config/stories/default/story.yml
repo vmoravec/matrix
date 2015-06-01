@@ -2,13 +2,7 @@
 story:
   default:
     qa2: &qa2
-      desc: Default setup for qa2 cloud with linuxbridge as network plugin
-      ignore_features: <%= ENV['ignore_features'] || false %>
-      nodes:
-        - host: d00-25-90-e5-04-54
-          alias: dashboard
-          role: controller
-
+      desc: "Default setup for qa2 cloud with linuxbridge as network plugin"
       mkcloud: &mkcloud
         cloudsource: <%= ENV['cloudsource'] || 'develcloud6' %>
         TESTHEAD: <%= ENV['TESTHEAD'] || 1 %>
@@ -24,36 +18,33 @@ story:
             user: crowbar
             password: crowbar
 
-      # default timeout will be 5 or 10 minutes
       runners: &runners
-        - config_gate:prepare_admin_node
+        - qa2_gate:prepare_admin_node:
+            timeout: "2 minutes"
         - qa_crowbarsetup:prepareinstallcrowbar:
-            timeout: 2 minutes
+            timeout: "2 minutes"
         - qa_crowbarsetup:installcrowbar:
             timeout: "10 minutes"
             stage: Crowbar installed
             features:
               - admin
-
-        qa_crowbarsetup:allocate:
-          stage: Nodes allocated
-        qa_crowbarsetup:waitcompute:
-        crowbar:batch:proposal:
-          - database:
-              stage: "Database barclamp installed"
-              timeout: 5 minutes
-          - nova:
-              timeout: "30 minutes"
-              stage: Controller node installed
-              features:
-                - admin
-                - controller
-
-          - tempest:
-              timeout: 20 minutes
-              stage: Tempest proposal installed
-              features:
-                - tempest
+        - qa_crowbarsetup:allocate:
+            tiemout: "5 minutes"
+            stage: Nodes allocated
+        - qa_crowbarsetup:waitcompute:
+        - crowbar:batch:proposal:
+            - database:
+                stage: "Database barclamp installed"
+                timeout: "5 minutes"
+            - nova:
+                timeout: "30 minutes"
+                stage: Controller node installed
+                features:
+                  - admin
+                  - controller
+            - tempest:
+                timeout: "20 minutes"
+                stage: Tempest proposal installed
 
     qa3:
       <<: *qa2

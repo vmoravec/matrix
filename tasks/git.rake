@@ -7,7 +7,7 @@ namespace :git do
     end
   end
 
-  namespace :automation do
+  namespace :auto do
     def automation_repo
       @path ||= matrix.config["vendor_dir"] + "/automation"
     end
