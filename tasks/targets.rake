@@ -1,10 +1,6 @@
 desc "List all targets"
 task :targets do
-  targets = Matrix.targets.map do |target|
-    length = 10 - target.name.length
-    "#{target.name}" + " "*length + "# #{target.desc}"
-  end
-  puts targets.join("\n")
+  puts Matrix.targets.list
 end
 
 namespace :target do

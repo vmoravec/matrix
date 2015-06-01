@@ -1,9 +1,19 @@
 proposals:
-  qa2:
-  qa3:
   virtual:
     - barclamp: nova
       deployment:
         elements:
           nova-multi-compute-kvm:
           - d52-54-03-77-77-03
+  qa2:
+    - barclamp: nova
+      deployment:
+        elements:
+          nova-multi-compute-kvm:
+          - d52-54-68-77-77-68
+
+    - barclamp: ceph
+      deployment:
+        elements:
+
+  qa3:

@@ -15,6 +15,13 @@ module Matrix
     def find target_name
       targets.find {|t| t.name == target_name.to_s }
     end
+
+    def list
+      targets.map do |target|
+        length = 10 - target.name.length
+        "#{target.name}" + " "*length + "# #{target.desc}"
+      end.join("\n")
+    end
   end
 
   class Target

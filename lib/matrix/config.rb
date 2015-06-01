@@ -61,7 +61,7 @@ module Matrix
       config_dir = dir.join(STORIES_DIR)
       load_default_story(config_dir)
       Dir.glob(config_dir.join("*")).each do |story_dir|
-        next if story_dir.end_with?("/default")
+        next if story_dir.end_with?("/default") || story_dir.end_with?("default.yml")
 
         story_config = Pathname.new(story_dir).join(STORY_FILE)
         files << story_config.to_s

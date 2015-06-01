@@ -2,56 +2,61 @@ require 'rake/tasklib'
 
 module Matrix
   class StoryTask < ::Rake::TaskLib
-    attr_reader :name, :config, :runners, :log, :targets
+    attr_reader :story_name, :config, :runners, :log, :targets, :current_target
 
     def initialize name, config
-      @name = name
+      @story_name = name
+      @current_target = ENV["target"]
       @config = config
       @targets = config.keys
       @verbose = Matrix.verbose?
       @log = Matrix.logger
-      log.debug("Using this story configuration: #{config.inspect}")
       define_tasks
-    end
-
-    private
-
-    def run_story target
-      main_config = config[target].reject {|k,v| k == "runners"}
-      runners.map {|runner| RunnerTask.new(name, target, runner << main_config)}.each(&:invoke)
-    end
-
-    def fail!
-      abort "Target for story '#{name}' not provided" unless current_target
-    end
-
-    def target_present
-      raise "Target for story '#{name}' not provided" unless current_target
-      raise "No runners defined for story '#{name}'" if runners.nil?
-      yield
     end
 
     def runners target
       config[target]["runners"]
     end
 
+    alias_method :name, :story_name
+
+    private
+
+    def run_story target
+      runner_tasks = runners(target).map do |runner|
+        RunnerTask.new(runner, self, target)
+      end
+      runner_tasks.each(&:invoke)
+    end
+
+    def fail!
+      abort "Target for story '#{story_name}' not provided" unless current_target
+    end
+
+    def target_present
+      raise "Target for story '#{story_name}' not provided" unless current_target
+      raise "No runners defined for story '#{story_name}'" if runners.nil?
+      yield
+    end
+
     def define_tasks
       namespace :story do
-        namespace name do
-          config.keys.each do |target|
+        targets.each do |target|
+          namespace story_name do
             task :run  do
+              abort "Target not defined. Targets available: \n#{Matrix.targets.list}" unless current_target
               run_story(target)
             end
 
             # Not using task desc on purpose
             task :config do
               require "awesome_print"
-              ap filter_story(name)
+              ap filter_story(story_name)
             end
 
             # Not showing task desc on purpose
             task :runners do
-              puts runners.keys
+              puts runners(story_name).keys
             end
 
             # Not showing task desc on purpose
@@ -109,9 +114,9 @@ module Matrix
               end
             end
 
-            desc config[target]["desc"]
-            task target => "story:#{name}:#{target}:run"
           end
+          desc config[target]["desc"]
+          task story_name => "story:#{story_name}:run"
         end
       end
 
