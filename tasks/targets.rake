@@ -1,6 +1,6 @@
 desc "List all targets"
 task :targets do
-  puts Matrix.targets.list
+  puts Matrix.targets.all
 end
 
 namespace :target do

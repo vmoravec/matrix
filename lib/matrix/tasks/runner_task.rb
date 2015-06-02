@@ -1,34 +1,29 @@
 module Matrix
   class RunnerTask
-    attr_reader :features, :feature_tasks, :runner_name, :log, :environment, :story
+    attr_reader :features, :runner_name, :log, :environment, :story
     attr_reader :ignore_features
     attr_reader :target, :runner_params
 
-    # @params [String, Array<String, Hash|String|nil, Hash>]
-    #
-    #   @Example:
-    #
-    def initialize params, story, target, multitask=false
-      @ignore_features = !!ENV["no-features"]
+    def initialize params, story
+      @ignore_features = ENV["features"] == "false" ? true : false
       @story = story
-      @target = target
-      #TODO Verify and extract params
-      # if they are Hash, the code below is fine
-      # if they are Array, we need to add child tasks and set this task
-      # as multitask when the #invoke method will trigger several tasks at once
+
       @runner_name, @runner_params = params.to_a.first
       @log = Matrix.logger
+
       return if ignore_features?
       return if runner_params.nil?
-
-      @feature_tasks = extract_features(runner_params).map do |feature_name|
-        FeatureTask.new(story, feature_name)
-      end
     end
 
     def invoke
-      current_runner { Rake::Task[runner_name].invoke }
-      feature_tasks.each(&:invoke) unless ignore_features?
+      expand_params.each do |params|
+        current_runner(params) do
+          Rake::Task[runner_name].invoke
+          extract_features(params).each do |feature_name|
+            FeatureTask.new(story, feature_name).invoke
+          end unless ignore_features?
+        end
+      end
     end
 
     def ignore_features?
@@ -37,52 +32,42 @@ module Matrix
 
     private
 
-    def current_runner
-      set_current_runner
+    def expand_params
+      case runner_params
+      when Hash
+        [ runner_params ]
+      when Array
+        runner_params
+      when nil
+        [ {} ]
+      else
+        raise "#{runner_params.class} not allowed for runner params"
+      end
+    end
+
+    def current_runner params
+      set_current_runner(params)
       yield
       log.info("Setting current_runner to nil")
       Matrix.config.current_runner = nil
     end
 
-    def set_current_runner
-      Matrix.config.current_runner = [
-        story.name,
-        environment
-      ]
+    def set_current_runner params
+      Matrix.config.current_runner = [ story, params ]
       log.info("Matrix.config.current_runner has been set for '#{runner_name}' " +
                "and story '#{story.name}'")
     end
 
     def extract_features params
-      features = []
       case params
       when Hash
-        feats = params["features"]
-        return unless feats
-
-        features.concat(feats)
-      when Array
-        params.each do |child_runner|
-          feats = child_runner["features"]
-          next unless feats
-
-        end
+        params["features"] || []
+      when nil
+        []
       else
-        abort "Runner config must be a Hash or an Array, got #{params.class}"
+        abort "Runner config must be a Hash or nil, got #{params.class}"
       end
     end
 
-    def verify_features feats
-      case feats
-      when nil, String, Array
-        {}
-      when Hash
-        feats
-      end
-    end
-
-    def log_warning data
-      log.warn("Features must be a hash, ignoring #{data.inspect}")
-    end
   end
 end

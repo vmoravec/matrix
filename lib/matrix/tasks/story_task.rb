@@ -2,165 +2,100 @@ require 'rake/tasklib'
 
 module Matrix
   class StoryTask < ::Rake::TaskLib
-    attr_reader :story_name, :config, :runners, :log, :targets, :current_target
+    attr_reader :story_name, :config, :runners, :log, :targets, :current_target,
+                :target_error
 
     def initialize name, config
+      @target_error = Proc.new {}
       @story_name = name
-      @current_target = ENV["target"]
+      @targets = config.keys.reject {|k| k == "desc"}.map do |target|
+        Matrix.targets.find(target)
+      end.flatten
+      @current_target = find_target(ENV["target"])
       @config = config
-      @targets = config.keys
       @verbose = Matrix.verbose?
       @log = Matrix.logger
       define_tasks
     end
 
-    def runners target
-      config[target]["runners"]
+    def runners
+      config[current_target.name]["runners"] || []
     end
 
     alias_method :name, :story_name
 
     private
 
-    def run_story target
-      runner_tasks = runners(target).map do |runner|
-        RunnerTask.new(runner, self, target)
+    def run_story
+      runner_tasks = runners.map do |runner|
+        RunnerTask.new(runner, self)
       end
+      #TODO Add some manager for log file
+      #     Add json recorder that will capture output from loggers
+      #     Rescue the task invoking below and add the runner end-time and success result (default is false)
       runner_tasks.each(&:invoke)
     end
 
-    def fail!
-      abort "Target for story '#{story_name}' not provided" unless current_target
-    end
+    def find_target target_name
+      targets_available = "Targets available: \n#{Matrix.targets.only(targets.map(&:name))}"
+      if target_name.nil? || target_name.to_s.empty?
+        missing_target = "No target provided for story '#{story_name}'. "
+        @target_error = Proc.new { abort missing_target + targets_available }
+        return
+      end
 
-    def target_present
-      raise "Target for story '#{story_name}' not provided" unless current_target
-      raise "No runners defined for story '#{story_name}'" if runners.nil?
-      yield
+      target = targets.find {|t| t.name == target_name }
+      if target.nil?
+        not_found = "Target '#{target_name}' not found for story '#{story_name}'. "
+        @target_error = Proc.new { abort not_found + targets_available }
+        return
+      end
+
+      target
     end
 
     def define_tasks
       namespace :story do
-        targets.each do |target|
-          namespace story_name do
-            task :run  do
-              abort "Target not defined. Targets available: \n#{Matrix.targets.list}" unless current_target
-              run_story(target)
-            end
-
-            # Not using task desc on purpose
-            task :config do
-              require "awesome_print"
-              ap filter_story(story_name)
-            end
-
-            # Not showing task desc on purpose
-            task :runners do
-              puts runners(story_name).keys
-            end
-
-            # Not showing task desc on purpose
-            task :targets do
-              puts targets
-            end
-
-            # Not showing task desc on purpose
-            task :stages do
-              stages = []
-              current_stage = nil
-              runners.each_pair do |runner_name, children|
-                if (children.nil? || children.empty?) && current_stage.nil?
-                  stages << { "No stage" => [ runner_name, { features:{} } ] }
-                  next
-                end
-
-                if (children.nil? || children.empty?) && current_stage
-                  stages << { current_stage => [ runner_name, {features: {}} ] }
-                  warn_on_missing_features(current_stage, runner_name)
-                  next
-                end
-
-                if (children.nil? || children.empty?)
-                  stages << {"No stage" => [ runner_name, {features: {}} ] }
-                  current_stage = nil
-                  next
-                end
-
-                if children.has_key?("stage") && children["stage"].nil?
-                  stages << {"No stage" => [ runner_name, { features: children["features"] || {}} ]}
-                  current_stage = nil
-                  next
-                end
-
-                if children["stage"]
-                  stages << {children["stage"] => [ runner_name, {features: children["features"] || {}} ] }
-                  current_stage = children["stage"]
-                  warn_on_missing_features(current_stage, runner_name, children)
-                  next
-                end
-              end
-              puts stages.inspect
-            end
-
-            # Not showing task desc on purpose
-            task :features do
-              runners(target).each_pair do |runner, features|
-                puts runner
-                next if features.nil?
-
-                features = resolve_features(features)
-                next if features.nil? || features.empty?
-                puts features
-              end
-            end
-
+        namespace story_name do
+          task :run  do
+            target_error.call
+            run_story
           end
-          desc config[target]["desc"]
-          task story_name => "story:#{story_name}:run"
+
+          # Not using task desc on purpose
+          task :config do
+            target_error.call
+            require "awesome_print"
+            puts "Showing config for story '#{story_name}' and target '#{current_target.name}':"
+            ap filter_story(story_name)
+          end
+
+          # Not showing task desc on purpose
+          task :runners do
+            target_error.call
+            puts runners.inspect
+          end
+
+          # Not showing task desc on purpose
+          task :targets do
+            puts Matrix.targets.only(targets.map(&:name))
+          end
         end
+
+        # Define the main task to run a story
+        desc config["desc"]
+        task story_name => "story:#{story_name}:run"
       end
 
       # Nested method
-      def filter_story story, target
+      def filter_story story
         abort "No configuration found for any stories" if matrix.config["story"].nil?
 
-        result = matrix.config["story"][story][target]
-        abort "No configuration found for story '#{story}'" if result.nil?
+        result = matrix.config["story"][story][current_target.name]
+        abort "No configuration found for story '#{story_name}'" if result.nil?
 
-        puts "Showing config for story '#{story}' and target '#{target}':"
         result
       end
-
-      # Nested method
-      def warn_on_missing_features stage_name, runner_name, nodes={}
-        log.warn(
-        "Stage '#{stage_name}' in runner '#{runner_name}' has no features"
-        ) unless nodes["features"]
-      end
-
-      # Nested method
-      def resolve_features features
-        case features
-        when String
-          nil
-        when Hash
-          feats = features["features"]
-          return if feats.nil?
-          return if feats.empty?
-          resolve_scenarios(feats)
-        end
-      end
-
-      # Nested method
-      def resolve_scenarios features
-        scenarios = ""
-        features.each_pair do |feature_name, scenars|
-          scenes = "#{scenars.map {|s| "    - #{s}"}.join("\n")}\n" if scenars
-          scenarios << "  #{feature_name}\n#{scenes}"
-        end
-        scenarios
-      end
     end
-
   end
 end

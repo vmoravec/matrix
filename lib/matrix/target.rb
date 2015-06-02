@@ -2,7 +2,7 @@ module Matrix
   class Targets
     extend Forwardable
 
-    def_delegators :@targets, :map
+    def_delegators :@targets, :map, :include?
 
     attr_reader :targets
 
@@ -16,7 +16,20 @@ module Matrix
       targets.find {|t| t.name == target_name.to_s }
     end
 
-    def list
+    def all
+      show(targets)
+    end
+
+    def only *target_names
+      selected = target_names.flatten.map do |target|
+        find(target)
+      end.flatten
+      show(selected)
+    end
+
+    private
+
+    def show targets
       targets.map do |target|
         length = 10 - target.name.length
         "#{target.name}" + " "*length + "# #{target.desc}"

@@ -17,6 +17,7 @@ require "matrix/rake/dsl"
 require "matrix/tasks/story_task"
 require "matrix/tasks/runner_task"
 require "matrix/tasks/feature_task"
+require "matrix/runner"
 require "matrix/runners/mkcloud"
 require "matrix/runners/virtsetup"
 
@@ -58,7 +59,8 @@ module Matrix
     end
 
     def load_tasks subdir=nil
-      path = subdir ? "/tasks/#{subdir}/*.rake" : "/tasks/*.rake"
+      #path = subdir ? "/tasks/**/*.rake" : "/tasks/*.rake"
+      path = "/tasks/**/*.rake"
       Rake::TaskManager.record_task_metadata = true
       Dir.glob(root.to_s + path).each do |task|
         load task
