@@ -3,20 +3,25 @@ module Matrix
     attr_reader :features, :runner_name, :log, :environment, :story
     attr_reader :ignore_features
     attr_reader :target, :runner_params
+    attr_reader :tracker
 
     def initialize params, story
       @ignore_features = ENV["features"] == "false" ? true : false
       @story = story
-
       @runner_name, @runner_params = params.to_a.first
+      @tracker = Tracker.new(runner_name, :runner)
       @log = Matrix.logger
 
       return if ignore_features?
       return if runner_params.nil?
     end
 
+    alias_method :name, :runner_name
+
     def invoke
       expand_params.each do |params|
+        #TODO Add handling for tracker errors and so on!
+        story.tracker.runners << tracker
         current_runner(params) do
           Rake::Task[runner_name].invoke
           extract_features(params).each do |feature_name|

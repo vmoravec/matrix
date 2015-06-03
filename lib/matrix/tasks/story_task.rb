@@ -1,13 +1,15 @@
 require 'rake/tasklib'
+require "matrix/tracker"
 
 module Matrix
   class StoryTask < ::Rake::TaskLib
     attr_reader :story_name, :config, :runners, :log, :targets, :current_target,
-                :target_error
+                :target_error, :tracker
 
     def initialize name, config
       @target_error = Proc.new {}
       @story_name = name
+      @tracker = Tracker.new(story_name, :story)
       @targets = config.keys.reject {|k| k == "desc"}.map do |target|
         Matrix.targets.find(target)
       end.flatten
@@ -30,10 +32,22 @@ module Matrix
       runner_tasks = runners.map do |runner|
         RunnerTask.new(runner, self)
       end
-      #TODO Add some manager for log file
-      #     Add json recorder that will capture output from loggers
-      #     Rescue the task invoking below and add the runner end-time and success result (default is false)
-      runner_tasks.each(&:invoke)
+
+      runner_tasks.each do |runner|
+        begin
+          runner.invoke
+        rescue => e
+          tracker.failure!(e.message)
+          abort "Runner '#{runner.name}' failed: #{e.message}" +
+                "\nStory '#{story_name}' on target '#{current_target.name}' has failed."
+        end
+      end
+      tracker.success!
+    rescue => e
+      tracker.failure!(e.message)
+      raise
+    ensure
+      tracker.dump!
     end
 
     def find_target target_name
