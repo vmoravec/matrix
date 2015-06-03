@@ -20,6 +20,10 @@ story:
 
       runners: &runners
         - gate:prepare_admin_node:
+            timeout: "5 minutes"
+            stage: "Admin node prepared"
+            features:
+              - admin
         - qa_crowbarsetup:prepareinstallcrowbar:
             timeout: "2 minutes"
         - qa_crowbarsetup:installcrowbar:

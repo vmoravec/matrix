@@ -3,9 +3,12 @@ require "json"
 module Matrix
   class Tracker
     attr_reader :name, :type, :runners, :features, :success, :start_at, :end_at
+    attr_accessor :error
+    # Runner attributes
     attr_accessor :timeout
     attr_accessor :stage
-    attr_accessor :error
+    attr_accessor :command
+    attr_accessor :environment
 
     def initialize name, type
       @name = name

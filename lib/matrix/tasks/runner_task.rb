@@ -23,9 +23,15 @@ module Matrix
         #TODO Add handling for tracker errors and so on!
         story.tracker.runners << tracker
         current_runner(params) do
-          Rake::Task[runner_name].invoke
+          update_tracker(params)
+          begin
+            Rake::Task[runner_name].invoke
+          rescue => err
+            tracker.failure!(err.message)
+            story.abort!(self, err)
+          end
           extract_features(params).each do |feature_name|
-            FeatureTask.new(story, feature_name).invoke
+           #FeatureTask.new(story, feature_name).invoke
           end unless ignore_features?
         end
       end
@@ -36,6 +42,11 @@ module Matrix
     end
 
     private
+
+    def update_tracker params
+      tracker.stage = params["stage"]
+      tracker.timeout = params["timeout"]
+    end
 
     def expand_params
       case runner_params
@@ -51,16 +62,12 @@ module Matrix
     end
 
     def current_runner params
-      set_current_runner(params)
+      Matrix.config.current_runner = [ self, params ]
+      log.info("Matrix.config.current_runner has been set for '#{runner_name}' " +
+               "and story '#{story.name}'")
       yield
       log.info("Setting current_runner to nil")
       Matrix.config.current_runner = nil
-    end
-
-    def set_current_runner params
-      Matrix.config.current_runner = [ story, params ]
-      log.info("Matrix.config.current_runner has been set for '#{runner_name}' " +
-               "and story '#{story.name}'")
     end
 
     def extract_features params

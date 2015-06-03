@@ -26,6 +26,12 @@ module Matrix
 
     alias_method :name, :story_name
 
+    def abort! runner, error
+      message = "Runner '#{runner.name}' failed: #{error.message}"
+      tracker.failure!(message)
+      abort "#{message} \nStory '#{story_name}' for target '#{current_target.name}' has no happyend."
+    end
+
     private
 
     def run_story
@@ -36,10 +42,8 @@ module Matrix
       runner_tasks.each do |runner|
         begin
           runner.invoke
-        rescue => e
-          tracker.failure!(e.message)
-          abort "Runner '#{runner.name}' failed: #{e.message}" +
-                "\nStory '#{story_name}' on target '#{current_target.name}' has failed."
+        rescue => err
+          abort!(runner, err)
         end
       end
       tracker.success!
