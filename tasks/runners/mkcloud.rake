@@ -26,15 +26,11 @@ namespace :mkcloud do
 
   desc "Install default proposal"
   task :installproposal do
-    mkcloud.exec!  "proposal"
+    mkcloud.exec! "proposal"
   end
 
   desc "Show the full path to mkcloud script"
   task :binpath do
-    puts Matrix.root.join(
-      matrix.config["vendor_dir"],
-      Matrix::Mkcloud::SCRIPT_DIR,
-      Matrix::Mkcloud::COMMAND
-    )
+    mkcloud.binpath
   end
 end

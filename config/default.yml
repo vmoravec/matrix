@@ -5,7 +5,7 @@ git:
 
 targets:
   qa2:
-    desc: "Cloud 2 in rack 19 in server room 2"
+    desc: "Cloud 2 in rack 19 in server room 2 in Nürnberg"
     gate:
       fqdn: gate.cloud2adm.qa.suse.de
       user: root
@@ -14,10 +14,9 @@ targets:
       ip: 10.162.24.10
       fqdn: crowbar.cloud2adm.qa.suse.de
       user: root
-      password: linux
 
   qa3:
-    desc: "Cloud 3 in rack 19 in server room 2"
+    desc: "Cloud 3 in rack 19 in server room 2 in Nürnberg"
     gate:
       fqdn: gate.cloud3adm.qa.suse.de
       user: root
@@ -26,19 +25,13 @@ targets:
       ip: 10.162.24.10
       fqdn: crowbar.cloud3adm.qa.suse.de
       user: root
-      password:
 
   virtual:
     desc: "Virtualized environment using libvirt"
-    gate:
-      fqdn: manacor.suse.cz
-      user: vmoravec
-      port: 22
     admin_node:
       ip: 192.168.175.10
       user: root
       password:
-
 
 timeout:
   ssh: 5

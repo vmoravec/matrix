@@ -2,14 +2,23 @@ module Matrix
   class LocalCommand
     Result = Struct.new(:success?, :output, :exit_code, :host)
 
-    attr_reader :log
+    attr_reader :log, :runner, :environment
 
-    def initialize tag=nil, logger: nil
+    def initialize tag=nil, logger: nil, runner: nil
       @log = logger || BaseLogger.new(tag || "LOCAL")
+      @runner = runner
+      @environment = {}
     end
 
     def exec! command_name, *args
       command = "#{command_name} #{args.join(" ")}".strip
+      runner.tracker.command = command if runner
+
+      if Matrix.dryrun?
+        puts command
+        return
+      end
+
       log.info("Running command `#{command}`")
       result = Result.new(false, "", 1000, Matrix.hostname)
 
@@ -40,6 +49,12 @@ module Matrix
       log.error("#{result.host}: #{result.output}")
       raise LocalCommandFailed.new(result)
     end
+
+    def update_env env_hash
+      environment.merge!(env_hash)
+    end
+
+    private
 
     def log_command_output line
       case line.chomp

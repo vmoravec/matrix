@@ -18,8 +18,6 @@ module Matrix
 
     attr_reader :raw
 
-    attr_accessor :current_runner
-
     def initialize
       @dir = Matrix.root.join(DIR)
       @files = []

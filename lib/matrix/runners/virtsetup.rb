@@ -1,22 +1,20 @@
 module Matrix
-  class Virtsetup
+  class Virtsetup < Runner
 
     LOG_TAG = "VIRTSETUP"
     LOSETUP_BIN = "/sbin/losetup"
     MODPROBE_BIN = "/sbin/modprobe"
     TEMP_DIR = "tmp/"
+    IMAGE = "story_image.img"
 
-    include Utils::Runner
     include Utils::User
-    include Utils::StoryDetection
 
-    attr_reader :environment, :story_name, :command
+    attr_reader :environment, :command
     attr_reader :image_file, :image_size
 
     def initialize
-      @story_name, @environment = detect_configuration
       @command = LocalCommand.new(LOG_TAG)
-      @image_file = Matrix.root.join(TEMP_DIR, story_name + ".img").to_s
+      @image_file = Matrix.root.join(TEMP_DIR, IMAGE).to_s
       @image_size = environment["mkcloud"]["lvm_size"]
     end
 

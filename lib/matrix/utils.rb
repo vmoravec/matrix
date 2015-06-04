@@ -13,39 +13,6 @@ module Matrix
       end
     end
 
-    module Runner
-      def runner_config
-        if Matrix.config["current_runner"].nil?
-          include StoryDetection
-
-          story_name = ENV["story"]
-          fail "Story not detected. Try to provide environment variable story=STORY_NAME"
-
-          config = detect_story(story_name)
-          Matrix.config["current_runner"] = config
-        end
-
-        yield Matrix.config["current_runner"]
-      end
-    end
-
-    module StoryDetection
-      def detect_configuration
-        if Matrix.config.current_runner.nil?
-          story = ENV["story"]
-          if story.nil?
-            raise "Story name not found. For standalone runner provide 'story=NAME'"
-          end
-
-          config = Matrix.config["story"][story]
-          raise "Configuration for story '#{story}' not found" unless config
-
-          return [ story, config.reject {|k,v| k == "runners"} ]
-        end
-        Matrix.config.current_runner
-      end
-    end
-
     module Validations
       def validate_base!
         if !Dir.exist?(matrix.config["vendor_dir"] + Matrix::Mkcloud::SCRIPT_DIR)

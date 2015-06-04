@@ -4,17 +4,18 @@ require "matrix/tracker"
 module Matrix
   class StoryTask < ::Rake::TaskLib
     attr_reader :story_name, :config, :runners, :log, :targets, :current_target,
-                :target_error, :tracker
+                :target_error, :tracker, :story_desc
 
     def initialize name, config
       @target_error = Proc.new {}
       @story_name = name
-      @tracker = Tracker.new(story_name, :story)
+      @tracker = Tracker.new(:story, story_name)
       @targets = config.keys.reject {|k| k == "desc"}.map do |target|
         Matrix.targets.find(target)
       end.flatten
       @current_target = find_target(ENV["target"])
       @config = config
+      @story_desc = config["desc"]
       @verbose = Matrix.verbose?
       @log = Matrix.logger
       define_tasks
@@ -26,24 +27,25 @@ module Matrix
 
     alias_method :name, :story_name
 
-    def abort! runner, error
-      message = "Runner '#{runner.name}' failed: #{error.message}"
+    def abort! task, error
+      message = "Story failed at task '#{task.name}': #{error.message}"
+      message << "\n" << error.backtrace.join("\n") if Matrix.verbose?
       tracker.failure!(message)
+      log.error("Aborting story #{story_name} due to error in task #{task.name}")
       abort "#{message} \nStory '#{story_name}' for target '#{current_target.name}' has no happyend."
     end
 
     private
 
     def run_story
+      log.info("Launching story '#{story_name}:#{story_desc}' for target '#{current_target.name}'")
       runner_tasks = runners.map do |runner|
         RunnerTask.new(runner, self)
       end
 
       runner_tasks.each do |runner|
-        begin
+        adapt_config do
           runner.invoke
-        rescue => err
-          abort!(runner, err)
         end
       end
       tracker.success!
@@ -52,6 +54,13 @@ module Matrix
       raise
     ensure
       tracker.dump!
+    end
+
+    def adapt_config
+      @original_config = @config
+      @config = config[current_target.name]
+      yield
+      @config = @original_config
     end
 
     def find_target target_name

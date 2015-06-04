@@ -4,13 +4,14 @@ module Matrix
   class Tracker
     attr_reader :name, :type, :runners, :features, :success, :start_at, :end_at
     attr_accessor :error
+
     # Runner attributes
     attr_accessor :timeout
     attr_accessor :stage
     attr_accessor :command
     attr_accessor :environment
 
-    def initialize name, type
+    def initialize type, name
       @name = name
       @type = type
       @features = []
@@ -45,6 +46,7 @@ module Matrix
       output.merge!(
         timeout: timeout,
         stage: stage,
+        command: command,
         features: features.map(&:to_json)
       ) if type == :runner
 
@@ -58,6 +60,8 @@ module Matrix
     end
 
     def dump!
+      return if Matrix.dryrun?
+
       path = Matrix.root.join(Matrix::LOG_DIR, "story.json")
       File.delete(path) if File.exist?(path)
       File.write(path, to_json)

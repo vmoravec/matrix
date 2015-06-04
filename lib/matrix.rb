@@ -30,8 +30,11 @@ module Matrix
     attr_reader :root, :user, :logger, :config, :hostname, :log_path, :cct, :command
     attr_reader :targets
 
+    attr_accessor :current_runner
+
     def configure root_dir, logger: nil, verbose: false, log_path: nil
       @verbose = verbose == true
+      @dryrun = !!ENV["dryrun"]
       @root = Pathname.new(root_dir)
       @config = Config.new
       @user = LocalUser.new
@@ -48,6 +51,10 @@ module Matrix
 
     def verbose?
       @verbose
+    end
+
+    def dryrun?
+      @dryrun
     end
 
     def update_logger base_logger

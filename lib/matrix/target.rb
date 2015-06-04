@@ -84,7 +84,7 @@ Admin node:
   Ip:       #{admin_node.ip}
   Fqdn:     #{admin_node.fqdn}
   User:     #{admin_node.user}
-  Password: #{admin_node.password || '(none)'}
+  Password: #{admin_node.password || '(unspecified)'}
 output
       else
         <<output
@@ -93,7 +93,7 @@ Admin node:
   Ip:       #{admin_node.ip}
   Fqdn:     #{admin_node.fqdn}
   User:     #{admin_node.user}
-  Password: #{admin_node.password || '(none)'}
+  Password: #{admin_node.password || '(unspecified)'}
 output
       end
     end

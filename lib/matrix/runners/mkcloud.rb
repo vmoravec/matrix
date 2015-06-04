@@ -1,5 +1,5 @@
 module Matrix
-  class Mkcloud
+  class Mkcloud < Runner
 
     LOG_TAG = "MKCLOUD"
     COMMAND = "mkcloud"
@@ -17,31 +17,32 @@ module Matrix
     )
 
     include Utils::User
-    include Utils::StoryDetection
 
-    attr_reader :bin_path, :log, :story_name, :environment
+    attr_reader :bin_path, :log
 
     def initialize
-      @story_name, @environment = detect_configuration
-      update_mkcloud_config
+      super
       @log = BaseLogger.new(LOG_TAG)
-      @command = LocalCommand.new(LOG_TAG)
+      @command = LocalCommand.new(LOG_TAG, runner: self)
       @bin_path = Matrix.config["vendor_dir"] + SCRIPT_DIR + COMMAND
     end
 
+    def binpath
+      Matrix.root.join(Matrix.config["vendor_dir"], SCRIPT_DIR, COMMAND)
+    end
+
     def exec! action
-      return
       command.exec!(
-        "#{sudo} #{env.map {|c| "#{c[0]}=#{c[1]}" }.join(" ")} #{bin_path} #{action}"
+        "#{sudo} #{bin_path} #{action}"
       )
     end
 
     def update_mkcloud_config
-      log.info "Updating story config: cloud => #{story_name}"
-      config["cloud"] = story_name
-      config["cloudpv"] = detect_loop_device(story_name) || find_available_loop_device
-      config["cloudbr"] = story_name + "-br"
-      config["virtualcloud"] = story_name
+      log.info "Updating story config: cloud => #{story.name}"
+      config["cloud"] = story.name
+      config["cloudpv"] = detect_loop_device(story.name) || find_available_loop_device
+      config["cloudbr"] = story.name + "-br"
+      config["virtualcloud"] = story.name
       config
     end
 
