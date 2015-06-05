@@ -23,7 +23,7 @@ module Matrix
     alias_method :name, :runner_name
 
     def invoke
-      expand_params.each do |params|
+      extract_params.each do |params|
         story.tracker.runners << tracker
         current_runner(params) do
           update_tracker(params)
@@ -78,7 +78,7 @@ module Matrix
       log.error(err.backtrace.join("\n"))
     end
 
-    def expand_params
+    def extract_params
       case runner_params
       when Hash
         [ runner_params ]

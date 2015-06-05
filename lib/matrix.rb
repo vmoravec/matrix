@@ -20,6 +20,7 @@ require "matrix/tasks/feature_task"
 require "matrix/runner"
 require "matrix/runners/mkcloud"
 require "matrix/runners/virtsetup"
+require "matrix/runners/gate"
 
 module Matrix
   LOG_TAG = "MATRIX"

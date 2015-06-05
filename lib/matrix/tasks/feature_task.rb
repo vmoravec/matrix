@@ -16,7 +16,7 @@ module Matrix
       # Cucumber features run in a forked process created by the cucumber rake task
       # Set the environment variables to let it work properly according to our needs
       def invoke_feature task_name, story
-        cct_config = Matrix.config["cct"] || Matrix.config["story"][story.name]["cct"]
+        cct_config = story.config["cct"]
         if cct_config.nil?
           abort "Cct config not found. You need to specify it in `config/cct.yml` file " +
                 "or in a separate 'cct' section in a story configuration yaml file"
@@ -32,7 +32,7 @@ module Matrix
 
     PREFIX = "feature"
 
-    attr_reader :feature, :name, :log, :story_name
+    attr_reader :feature, :name, :log, :story
 
     def initialize story, feature_name
       @story = story

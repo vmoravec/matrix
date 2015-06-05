@@ -47,10 +47,10 @@ module Matrix
         timeout: timeout,
         stage: stage,
         command: command,
-        features: features.map(&:to_json)
+        features: features.map(&:data)
       ) if type == :runner
 
-      output.merge!(runners: runners.map(&:to_json)) if type == :story
+      output.merge!(runners: runners.map(&:data)) if type == :story
       output.merge!(error: error) unless success
       output
     end

@@ -53,6 +53,7 @@ module Matrix
       tracker.failure!(e.message)
       raise
     ensure
+      puts tracker.data.inspect
       tracker.dump!
     end
 

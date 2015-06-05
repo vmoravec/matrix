@@ -11,6 +11,7 @@ story:
 
       cct:
         admin_node: &admin_node
+          ip: 10.162.24.10
           ssh:
             user: root
             password: linux
@@ -19,7 +20,7 @@ story:
             password: crowbar
 
       runners: &runners
-        - gate:prepare_admin_node:
+        - gate:prepare_admin_domain:
             timeout: "5 minutes"
             stage: "Admin node prepared"
             features:

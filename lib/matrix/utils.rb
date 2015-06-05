@@ -12,13 +12,5 @@ module Matrix
         !Matrix.user.root?
       end
     end
-
-    module Validations
-      def validate_base!
-        if !Dir.exist?(matrix.config["vendor_dir"] + Matrix::Mkcloud::SCRIPT_DIR)
-          abort "Missing automation repository. Try `rake git:automation:clone`"
-        end
-      end
-    end
   end
 end
