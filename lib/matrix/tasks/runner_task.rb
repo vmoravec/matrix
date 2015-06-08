@@ -45,14 +45,14 @@ module Matrix
     rescue => err
       log_error(err)
       tracker.failure!("Runner failed: #{err.message}")
-      story.abort!(self, err)
+      story.task.abort!(self, err)
     end
 
     def handle_cucumber_exit feature_tracker, feature_name
       log.error("Feature failed, exiting..")
       feature_tracker.failure!("Feature failed")
       tracker.failure!("Feature '#{feature_name}' failed")
-      story.abort!(
+      story.task.abort!(
         feature_tracker,
         OpenStruct.new( # replicate an exception object
           message: "Feature #{feature_name} failed",
@@ -76,7 +76,7 @@ module Matrix
           log_error(err)
           feature_tracker.failure!(err.message)
           tracker.failure!("Feature '#{feature_name}' failed: #{err.message}")
-          story.abort!(feature_tracker, err)
+          story.task.abort!(feature_tracker, err)
         end
       end unless ignore_features?
     end
