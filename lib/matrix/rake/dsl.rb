@@ -12,6 +12,10 @@ module Rake
       @virtsetup ||= Matrix::Virtsetup.new
     end
 
+    def gate
+      @gate ||= Matrix::Gate.new
+    end
+
     def command
       Matrix.command
     end
