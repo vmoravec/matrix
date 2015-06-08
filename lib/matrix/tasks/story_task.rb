@@ -27,10 +27,12 @@ module Matrix
 
     alias_method :name, :story_name
 
-    def abort! task, error
+    def abort! task, error, dump_json: false
       message = "Story failed at task '#{task.name}': #{error.message}"
       message << "\n" << error.backtrace.join("\n") if Matrix.verbose?
       tracker.failure!(message)
+      tracker.dump! if dump_json
+
       log.error("Aborting story #{story_name} due to error in task #{task.name}")
       abort "#{message} \nStory '#{story_name}' for target '#{current_target.name}' has no happyend."
     end
@@ -53,7 +55,6 @@ module Matrix
       tracker.failure!(e.message)
       raise
     ensure
-      puts tracker.data.inspect
       tracker.dump!
     end
 

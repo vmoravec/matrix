@@ -48,11 +48,28 @@ module Matrix
       story.abort!(self, err)
     end
 
+    def handle_cucumber_exit feature_tracker, feature_name
+      log.error("Feature failed, exiting..")
+      feature_tracker.failure!("Feature failed")
+      tracker.failure!("Feature '#{feature_name}' failed")
+      story.abort!(
+        feature_tracker,
+        OpenStruct.new( # replicate an exception object
+          message: "Feature #{feature_name} failed",
+          backtrace: []
+        ),
+        dump_json: true
+      )
+    end
+
     def invoke_features params
       extract_features(params).each do |feature_name|
         feature_tracker = Tracker.new(:feature, feature_name)
         tracker.features << feature_tracker
         begin
+          # Catch the exit of cucumber feature rake task in case it fails and
+          # finish the story with all trackers gracefuly
+          Kernel.at_exit { handle_cucumber_exit(feature_tracker, feature_name) }
           FeatureTask.new(story, feature_name).invoke
           feature_tracker.success!
         rescue => err
