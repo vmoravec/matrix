@@ -12,29 +12,27 @@ module Matrix
       define_tasks
     end
 
-    def abort! task, error, dump_json: false
-      message = "Story failed at task '#{task.name}': #{error.message}"
+    def abort! task, error, dump_json: false, type: nil
+      message = "Story failed at task '#{type ? type.to_s + ":" : nil}#{task.name}'"
       message << "\n" << error.backtrace.join("\n") if Matrix.verbose?
       story.tracker.failure!(message)
       story.tracker.dump! if dump_json
 
       log.error("Aborting story #{story.name} due to error in task #{task.name}")
-      abort "#{message} \nStory '#{story.name}' for target '#{story.current_target.name}' has no happyend."
+      abort message
     end
 
     private
 
     def run_story
       log.info("Launching story '#{story.name}:#{story.desc}' for target '#{story.current_target.name}'")
-      runner_tasks = story.runners.map do |runner|
-        RunnerTask.new(runner, story)
+      runner_tasks = story.runners.map do |runner_details|
+        story.runner_options = runner_details
+        RunnerTask.new(story)
       end
 
-      runner_tasks.each do |runner|
-        adapt_config do
-          runner.invoke
-        end
-      end
+      runner_tasks.each {|runner| runner.invoke }
+
       story.tracker.success!
     rescue => e
       story.tracker.failure!(e.message)
@@ -43,24 +41,17 @@ module Matrix
       story.tracker.dump!
     end
 
-    def adapt_config
-      @original_config = @config
-      @config = story.config[current_target.name]
-      yield
-      @config = @original_config
-    end
-
     def define_tasks
       namespace :story do
         namespace story.name do
           task :run  do
-            story.target_error.call
+            story.finalize!
             run_story
           end
 
           # Not using task desc on purpose
           task :config do
-            story.target_error.call
+            story.finalize!
             require "awesome_print"
             puts "Showing config for story '#{story.name}' and target '#{story.current_target.name}':"
             ap filter_story(story.name)
@@ -68,7 +59,7 @@ module Matrix
 
           # Not showing task desc on purpose
           task :runners do
-            story.target_error.call
+            story.finalize!
             puts story.runners.inspect
           end
 

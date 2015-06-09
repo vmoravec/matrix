@@ -16,18 +16,25 @@ module Matrix
       # Cucumber features run in a forked process created by the cucumber rake task
       # Set the environment variables to let it work properly according to our needs
       def invoke_feature task_name, story
-        cct_config = story.config["cct"]
-        if cct_config.nil?
-          abort "Cct config not found. You need to specify it in `config/cct.yml` file " +
-                "or in a separate 'cct' section in a story configuration yaml file"
-        end
-
+        update_cct_config(story)
         ENV["cct_log_path"] = Matrix.root.join(Matrix::LOG_DIR, ::Cct::LOG_FILENAME).to_s
+        ENV["nocolors"] = "true"
         Dir.chdir(Matrix.cct.gem_dir) do
-          ENV["cct_config"] = cct_config.to_yaml
           Rake::Task[task_name].invoke
+          Rake::Task[task_name].reenable
         end
       end
+
+      private
+
+      def update_cct_config story
+        cct_config = {
+          "admin_node" => story.current_target.admin_node.credentials
+        }
+        cct_config.merge!("cucumber" => Matrix.config["cucumber"])
+        ENV["cct_config"] = cct_config.to_yaml
+      end
+
     end
 
     PREFIX = "feature"

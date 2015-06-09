@@ -32,7 +32,7 @@ module Matrix
     attr_reader :root, :user, :logger, :config, :hostname, :log_path, :cct, :command
     attr_reader :targets
 
-    attr_accessor :current_runner
+    attr_accessor :current_story
 
     def configure root_dir, logger: nil, verbose: false, log_path: nil
       @verbose = verbose == true

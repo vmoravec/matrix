@@ -9,22 +9,12 @@ story:
         UPDATEREPOS: <%= ENV['UPDATEREPOS'] || 1 %>
         networkingplugin: <%= ENV['networkingplugin'] || 'linuxbridge' %>
 
-      cct:
-        admin_node: &admin_node
-          ip: 10.162.24.10
-          ssh:
-            user: root
-            password: linux
-          api:
-            user: crowbar
-            password: crowbar
-
       runners: &runners
-        - gate:prepare_admin_domain:
-            timeout: "5 minutes"
+        - gate:prepare_admin:
+            timeout: "5 seconds"
             stage: "Admin node prepared"
             features:
-              - admin
+              - admin:os
         - qa_crowbarsetup:prepareinstallcrowbar:
             timeout: "2 minutes"
         - qa_crowbarsetup:installcrowbar:
@@ -35,7 +25,6 @@ story:
         - qa_crowbarsetup:allocate:
             tiemout: "5 minutes"
             stage: Nodes allocated
-        - qa_crowbarsetup:waitcompute:
         - crowbar:batch:proposal:
             - database:
                 stage: "Database proposal installed"

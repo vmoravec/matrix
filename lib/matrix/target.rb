@@ -44,11 +44,7 @@ module Matrix
       @name = name
       @desc = options["desc"]
       @gate = Gate.new(options["gate"]) if options["gate"]
-      @admin_node = AdminNode.new(options.merge("gate" => gate))
-    end
-
-    def verify!
-      gate.verify!
+      @admin_node = AdminNode.new(options)
     end
 
     class Gate
@@ -61,13 +57,6 @@ module Matrix
         @user = params["user"]
         @password = params["password"]
         @domain = params["admin_domain"]
-        @command = RemoteCommand.new(
-          ip: ip || fqdn, user: user, password: password
-        )
-      end
-
-      def exec! *params
-        command.exec!(*params)
       end
 
     end

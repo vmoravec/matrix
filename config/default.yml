@@ -4,6 +4,7 @@ git:
     branch: master
 
 targets:
+  # SSH key based authentication
   qa2:
     desc: "Cloud 2 in rack 19 in server room 2 in Nürnberg"
     gate:
@@ -13,8 +14,14 @@ targets:
     admin_node:
       ip: 10.162.24.10
       fqdn: crowbar.cloud2adm.qa.suse.de
-      user: root
+      ssh: &ssh
+        user: root
+        password: linux
+      api: &api
+        user: crowbar
+        password: crowbar
 
+  # SSH key based authentication
   qa3:
     desc: "Cloud 3 in rack 19 in server room 2 in Nürnberg"
     gate:
@@ -22,16 +29,26 @@ targets:
       user: root
       admin_domain: crowbar3
     admin_node:
-      ip: 10.162.24.10
+      ip: 10.162.25.10
       fqdn: crowbar.cloud3adm.qa.suse.de
-      user: root
+      ssh:
+        <<: *ssh
+      api:
+        <<: *api
 
   virtual:
+    proxy: manacor.suse.cz
     desc: "Virtualized environment using libvirt"
     admin_node:
       ip: 192.168.175.10
-      user: root
-      password:
-
+      ssh:
+        <<: *ssh
+      api:
+        <<: *api
+cucumber:
+  formats:
+    - pretty: "log/features"
+    - json: "log/features"
+ 
 timeout:
   ssh: 5

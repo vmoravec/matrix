@@ -1,34 +1,31 @@
 require 'timeout'
+require 'ruby-progressbar'
 
 module Matrix
   class RunnerTask
-    DEFAULT_TIMEOUT = "5 minutes"
+    DEFAULT_TIMEOUT = "1 minute"
 
     attr_reader :features, :runner_name, :log, :environment, :story
     attr_reader :ignore_features
-    attr_reader :target, :runner_params
-    attr_reader :tracker
+    attr_reader :target, :runner_options
 
-    def initialize params, story
-      @ignore_features = ENV["features"] == "false" ? true : false
+    def initialize story
       @story = story
-      @runner_name, @runner_params = params.to_a.first
-      @tracker = Tracker.new(:runner, runner_name)
+      @ignore_features = ENV["features"] == "false" ? true : false
+      @runner_name, @runner_options = story.runner_options.to_a.first
       @log = Matrix.logger
-
-      return if ignore_features?
-      return if runner_params.nil?
     end
 
     alias_method :name, :runner_name
 
     def invoke
-      extract_params.each do |params|
+      extract_options.each do |params|
+        tracker = Tracker.new(:runner, runner_name)
         story.tracker.runners << tracker
-        current_runner(params) do
-          update_tracker(params)
-          invoke_runner(params)
-          invoke_features(params)
+        update_tracker(tracker, params)
+        current_story(params) do
+          invoke_runner(tracker, params)
+          invoke_features(tracker, params)
           tracker.success!
         end
       end
@@ -36,7 +33,16 @@ module Matrix
 
     private
 
-    def invoke_runner params
+    def current_story params
+      Matrix.current_story = story
+      log.debug("Matrix.current_story has been set for '#{runner_name}' " +
+               "and story '#{story.name}'")
+      yield
+      log.debug("Setting current_story to nil")
+      Matrix.current_story = nil
+    end
+
+    def invoke_runner tracker, params
       event = params["stage"] || runner_name
       time = params["timeout"].to_s || DEFAULT_TIMEOUT
       wait_for(event, max: time) do
@@ -48,28 +54,32 @@ module Matrix
       story.task.abort!(self, err)
     end
 
-    def handle_cucumber_exit feature_tracker, feature_name
+    def handle_cucumber_exit feature_tracker, tracker, feature_name
+      return if $?.success?
+
       log.error("Feature failed, exiting..")
-      feature_tracker.failure!("Feature failed")
       tracker.failure!("Feature '#{feature_name}' failed")
+      feature_tracker.failure!("Feature failed")
+      story.tracker.failure!("Feature '#{feature_name}' failed")
       story.task.abort!(
         feature_tracker,
         OpenStruct.new( # replicate an exception object
           message: "Feature #{feature_name} failed",
           backtrace: []
         ),
-        dump_json: true
+        dump_json: true,
+        type: :feature
       )
     end
 
-    def invoke_features params
+    def invoke_features tracker, params
       extract_features(params).each do |feature_name|
         feature_tracker = Tracker.new(:feature, feature_name)
         tracker.features << feature_tracker
         begin
-          # Catch the exit of cucumber feature rake task in case it fails and
+          # Catch the exit of cucumber feature rake task and in case it failed
           # finish the story with all trackers gracefuly
-          Kernel.at_exit { handle_cucumber_exit(feature_tracker, feature_name) }
+          Kernel.at_exit { handle_cucumber_exit(feature_tracker, tracker, feature_name) }
           FeatureTask.new(story, feature_name).invoke
           feature_tracker.success!
         rescue => err
@@ -85,7 +95,7 @@ module Matrix
       ignore_features
     end
 
-    def update_tracker params
+    def update_tracker tracker, params
       tracker.stage = params["stage"]
       tracker.timeout = params["timeout"]
     end
@@ -95,26 +105,17 @@ module Matrix
       log.error(err.backtrace.join("\n"))
     end
 
-    def extract_params
-      case runner_params
+    def extract_options
+      case runner_options
       when Hash
-        [ runner_params ]
+        [ runner_options ]
       when Array
-        runner_params
+        runner_options
       when nil
         [ {} ]
       else
-        raise "#{runner_params.class} not allowed for runner params"
+        raise "#{runner_options.class} not allowed for runner options"
       end
-    end
-
-    def current_runner params
-      Matrix.current_runner = [ self, params ]
-      log.debug("Matrix.current_runner has been set for '#{runner_name}' " +
-               "and story '#{story.name}'")
-      yield
-      log.debug("Setting current_runner to nil")
-      Matrix.current_runner = nil
     end
 
     def extract_features params
@@ -131,8 +132,22 @@ module Matrix
     def wait_for event, options
       period, period_units = options[:max].split
       timeout_time = convert_to_seconds(period, period_units)
+      progres_bar = ::ProgressBar.create(
+        :format => '%a <%B> %p%% %t',
+        :total => timeout_time,
+        :title => event
+      )
       log.info("Setting timeout for '#{event}' to #{options[:max]}")
-      Timeout.timeout(timeout_time) { yield }
+      counter = Thread.new do
+        timeout_time.times.each do
+          progres_bar.increment
+          sleep 1
+        end
+      end
+      Timeout.timeout(timeout_time) do
+        yield
+      end
+      counter.kill
     rescue Timeout::Error
       message = "Stage '#{event}' was not reached due to expired timeout (#{options[:max]})"
       raise message
