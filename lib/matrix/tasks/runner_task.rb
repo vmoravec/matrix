@@ -1,5 +1,4 @@
 require 'timeout'
-require 'ruby-progressbar'
 
 module Matrix
   class RunnerTask
@@ -43,13 +42,16 @@ module Matrix
     end
 
     def invoke_runner tracker, params
-      event = params["stage"] || runner_name
+      event = params["stage"] || "(none was given)"
       time = params["timeout"].to_s || DEFAULT_TIMEOUT
+      print "Invoking task #{runner_name} with timeout #{time} to reach stage '#{event}', command: "
       wait_for(event, max: time) do
         Rake::Task[runner_name].invoke
       end
+      puts story.tracker.runners.last.command
     rescue => err
       log_error(err)
+      puts
       tracker.failure!("Runner failed: #{err.message}")
       story.task.abort!(self, err)
     end
@@ -80,6 +82,7 @@ module Matrix
           # Catch the exit of cucumber feature rake task and in case it failed
           # finish the story with all trackers gracefuly
           Kernel.at_exit { handle_cucumber_exit(feature_tracker, tracker, feature_name) }
+          print "Invoking feature task #{feature_name}, command: "
           FeatureTask.new(story, feature_name).invoke
           feature_tracker.success!
         rescue => err
@@ -132,22 +135,10 @@ module Matrix
     def wait_for event, options
       period, period_units = options[:max].split
       timeout_time = convert_to_seconds(period, period_units)
-      progres_bar = ::ProgressBar.create(
-        :format => '%a <%B> %p%% %t',
-        :total => timeout_time,
-        :title => event
-      )
       log.info("Setting timeout for '#{event}' to #{options[:max]}")
-      counter = Thread.new do
-        timeout_time.times.each do
-          progres_bar.increment
-          sleep 1
-        end
-      end
       Timeout.timeout(timeout_time) do
         yield
       end
-      counter.kill
     rescue Timeout::Error
       message = "Stage '#{event}' was not reached due to expired timeout (#{options[:max]})"
       raise message
