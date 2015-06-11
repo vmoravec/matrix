@@ -10,7 +10,9 @@ targets:
     gate:
       fqdn: gate.cloud2adm.qa.suse.de
       user: root
-      admin_domain: crowbar2
+      admin_domain:
+        name: crowbar2
+        user: root
     admin_node:
       ip: 10.162.24.10
       fqdn: crowbar.cloud2adm.qa.suse.de
@@ -27,7 +29,9 @@ targets:
     gate:
       fqdn: gate.cloud3adm.qa.suse.de
       user: root
-      admin_domain: crowbar3
+      admin_domain:
+        name: crowbar3
+        user: root
     admin_node:
       ip: 10.162.25.10
       fqdn: crowbar.cloud3adm.qa.suse.de
@@ -37,8 +41,10 @@ targets:
         <<: *api
 
   virtual:
-    proxy: manacor.suse.cz
-    desc: "Virtualized environment using libvirt"
+    desc: "Virtualized environment libvirt"
+    gate:
+      fqdn: localhost
+
     admin_node:
       ip: 192.168.175.10
       ssh:
@@ -49,6 +55,6 @@ cucumber:
   formats:
     - pretty: "log/features"
     - json: "log/features"
- 
+
 timeout:
   ssh: 5

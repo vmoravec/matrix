@@ -1,6 +1,5 @@
 module Matrix
   class Mkcloud < Runner
-
     LOG_TAG = "MKCLOUD"
     COMMAND = "mkcloud"
     SCRIPT_DIR = "automation/scripts/"

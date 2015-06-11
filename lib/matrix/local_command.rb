@@ -2,17 +2,17 @@ module Matrix
   class LocalCommand
     Result = Struct.new(:success?, :output, :exit_code, :host)
 
-    attr_reader :log, :runner, :environment
+    attr_reader :log, :environment
 
-    def initialize tag=nil, logger: nil, runner: nil
+    attr_accessor :tracker
+
+    def initialize tag=nil, logger: nil
       @log = logger || BaseLogger.new(tag || "LOCAL")
-      @runner = runner
       @environment = {}
     end
 
     def exec! command_name, *args
       command = "#{command_name} #{args.join(" ")}".strip
-      runner.tracker.command = command if runner
 
       if Matrix.dryrun?
         puts command

@@ -43,48 +43,44 @@ module Matrix
     def initialize name, options
       @name = name
       @desc = options["desc"]
-      @gate = Gate.new(options["gate"]) if options["gate"]
+      @gate = Gate.new(options["gate"])
       @admin_node = AdminNode.new(options)
     end
 
     class Gate
-      attr_reader :ip, :fqdn, :user, :password, :domain, :command
+      attr_reader :ip, :fqdn, :user, :admin_domain, :command
 
       def initialize params
-        @gate = params["gate"]
         @ip = params["ip"]
         @fqdn = params["fqdn"]
         @user = params["user"]
-        @password = params["password"]
-        @domain = params["admin_domain"]
+        return unless params["admin_domain"]
+
+        @admin_domain = OpenStruct.new(
+          name: params["admin_domain"]["name"],
+          user: params["admin_domain"]["user"]
+        )
+      end
+
+      def localhost?
+        fqdn == "localhost"
       end
 
     end
 
     def inspect
-      if gate
       <<output
 Description: #{desc}
 Gate:
-  Fqdn:     #{gate.fqdn}
-  User:     #{gate.user}
-  Domain:   #{gate.domain}
+  Fqdn:  #{gate.fqdn}
+  User:  #{gate.user}
+  Admin domain:  #{gate.admin_domain.name if gate.admin_domain}
 Admin node:
-  Ip:       #{admin_node.ip}
-  Fqdn:     #{admin_node.fqdn}
-  User:     #{admin_node.user}
-  Password: #{admin_node.password || '(unspecified)'}
+  Ip:  #{admin_node.ip}
+  Fqdn:  #{admin_node.fqdn}
+  User:  #{admin_node.user}
+  Password:  #{admin_node.password || '(unspecified)'}
 output
-      else
-        <<output
-Description: #{desc}
-Admin node:
-  Ip:       #{admin_node.ip}
-  Fqdn:     #{admin_node.fqdn}
-  User:     #{admin_node.user}
-  Password: #{admin_node.password || '(unspecified)'}
-output
-      end
     end
 
   end

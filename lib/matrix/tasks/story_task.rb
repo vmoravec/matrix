@@ -19,7 +19,7 @@ module Matrix
       story.tracker.dump! if dump_json
 
       log.error("Aborting story #{story.name} due to error in task #{task.name}")
-      abort message
+      abort message << ", error: #{error.message}"
     end
 
     private

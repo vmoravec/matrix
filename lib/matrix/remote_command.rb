@@ -8,12 +8,13 @@ module Matrix
 
     Result = Struct.new(:success?, :output, :exit_code, :host)
 
-    attr_reader :session, :options, :log, :gateway
+    attr_reader :session, :options, :log, :gateway, :proxy
     attr_accessor :target
 
     def initialize opts
       @gateway = opts[:gateway]
       opts.merge!(gateway) if gateway
+      @proxy = set_ssh_proxy(opts[:proxy]) if opts[:proxy]
       @log = BaseLogger.new("SSH")
       @options = OpenStruct.new
       construct_options(opts)
@@ -76,6 +77,12 @@ module Matrix
 
     private
 
+    def set_ssh_proxy options
+      command = "ssh #{options["user"]}@#{options["fqdn"] || options["ip"]} nc %h #{options["port"] || '%p'}"
+      require "net/ssh/proxy/command"
+      Net::SSH::Proxy::Command.new(command)
+    end
+
     def open_session_channel &block
       if gateway
         session.ssh(target.ip, target.user, target.command_options) do |session|
@@ -118,12 +125,13 @@ module Matrix
     end
 
     def test_plain_ssh
-      Net::SSH::Transport::Session.new(
-        options.ip,
+      opts = {
         timeout: options.extended.timeout,
         port: options.extended.port,
-        logger: log
-      )
+        logger: log,
+      }
+      opts.merge!(proxy: proxy) if proxy
+      Net::SSH::Transport::Session.new(options.ip, opts)
     end
 
     def set_environment params
@@ -148,11 +156,12 @@ module Matrix
       options.extended.port = opts['port'] || opts[:port] if opts['port'] || opts[:port]
       options.extended.password = opts['password'] || opts[:password]
       options.extended.timeout = detect_timeout(opts)
+      options.extended.proxy = proxy
     end
 
     def detect_timeout opts={}
       timeout = TIMEOUT
-      timeout = Matrix.config['timeout']['ssh'] ? Matrix.config['timeout']['ssh'] : timeout
+      timeout = Matrix.config['timeout']['ssh'] || timeout
       timeout = opts['timeout'] || opts[:timeout] || timeout
       timeout.to_i
     end

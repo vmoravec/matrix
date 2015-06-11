@@ -42,13 +42,13 @@ module Matrix
     end
 
     def invoke_runner tracker, params
-      event = params["stage"] || "(none was given)"
+      event = params["stage"] || "(no target description was given)"
       time = params["timeout"].to_s || DEFAULT_TIMEOUT
-      print "Invoking task #{runner_name} with timeout #{time} to reach stage '#{event}', command: "
+      puts " >> Invoking task `#{runner_name}` with timeout #{time} to make '#{event}'"
+      print " >> Command: "
       wait_for(event, max: time) do
         Rake::Task[runner_name].invoke
       end
-      puts story.tracker.runners.last.command
     rescue => err
       log_error(err)
       puts
@@ -82,7 +82,8 @@ module Matrix
           # Catch the exit of cucumber feature rake task and in case it failed
           # finish the story with all trackers gracefuly
           Kernel.at_exit { handle_cucumber_exit(feature_tracker, tracker, feature_name) }
-          print "Invoking feature task #{feature_name}, command: "
+          puts " >> Invoking task `feature:#{feature_name}`"
+          print " >> Command: #{Matrix.user.login}@#{Matrix.hostname} -> "
           FeatureTask.new(story, feature_name).invoke
           feature_tracker.success!
         rescue => err

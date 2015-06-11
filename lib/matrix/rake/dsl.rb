@@ -16,6 +16,10 @@ module Rake
       @gate ||= Matrix::Gate.new
     end
 
+    def qa_crowbarsetup
+      @qa_crowbar ||= Matrix::QaCrowbarSetup.new
+    end
+
     def command
       Matrix.command
     end
