@@ -4,6 +4,10 @@ module Rake
       Matrix
     end
 
+    def story
+      @story ||= Matrix::Story.new
+    end
+
     def mkcloud
       @mkcloud ||= Matrix::Mkcloud.new
     end

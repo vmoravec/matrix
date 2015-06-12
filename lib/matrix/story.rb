@@ -29,6 +29,8 @@ module Matrix
       @runner_options = {}
     end
 
+    alias_method :target, :current_target
+
     def runners
       config["runners"] || []
     end
@@ -52,11 +54,18 @@ module Matrix
     end
 
     def finalize!
+      if @finalized && block_given?
+        yield self
+      end
+
       return if @finalized
 
       target_error.call
       @config = config[current_target.name]
       @finalized = true
+      yield self if block_given?
     end
+
+    alias_method :begin, :finalize!
   end
 end

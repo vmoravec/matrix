@@ -27,6 +27,7 @@ module Matrix
       params = params.flatten
       environment = set_environment(params)
       full_command = "#{command} #{params.join(" ")}".strip
+
       result = Result.new(false, "", 1000, host_ip)
       open_session_channel do |channel|
         channel.exec("#{environment}#{full_command}") do |p, d|

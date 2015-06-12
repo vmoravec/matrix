@@ -7,18 +7,18 @@ module Matrix
     TEMP_DIR = "tmp/"
     IMAGE = "story_image.img"
 
-    include Utils::User
-
     attr_reader :environment, :command
     attr_reader :image_file, :image_size
 
     def initialize
-      @command = LocalCommand.new(LOG_TAG)
+      super do
+        @command = LocalCommand.new(LOG_TAG)
+      end
       @image_file = Matrix.root.join(TEMP_DIR, IMAGE).to_s
-      @image_size = environment["mkcloud"]["lvm_size"]
+      @image_size = config["mkcloud"]["lvm_size"]
     end
 
-    def detach_story_image
+    def detach_image
       device = detect_loop_device
       return unless device
 

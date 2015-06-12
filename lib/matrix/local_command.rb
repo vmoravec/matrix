@@ -14,11 +14,6 @@ module Matrix
     def exec! command_name, *args
       command = "#{command_name} #{args.join(" ")}".strip
 
-      if Matrix.dryrun?
-        puts command
-        return
-      end
-
       log.info("Running command `#{command}`")
       result = Result.new(false, "", 1000, Matrix.hostname)
 

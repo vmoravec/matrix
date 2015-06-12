@@ -60,8 +60,6 @@ module Matrix
     end
 
     def dump!
-      return if Matrix.dryrun?
-
       path = Matrix.root.join(Matrix::LOG_DIR, "story.json")
       File.delete(path) if File.exist?(path)
       File.write(path, to_json)

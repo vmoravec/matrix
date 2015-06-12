@@ -11,24 +11,21 @@ story:
 
       runners: &runners
         - gate:prepare_admin:
-            timeout: "5 seconds"
+            timeout: "1 minute"
             stage: "Admin node prepared"
-            features:
-              - admin:test
-              - admin:test
-        - qa_crowbarsetup:test:
-            timeout: "5 seconds"
-            stage: "Test done"
-        - qa_crowbarsetup:prepareinstallcrowbar:
-            timeout: "2 minutes"
-        - qa_crowbarsetup:installcrowbar:
-            timeout: "10 minutes"
-            stage: Crowbar installed
-            features:
-              - admin
-        - qa_crowbarsetup:allocate:
-            tiemout: "5 minutes"
-            stage: Nodes allocated
+       #- qa_crowbarsetup:test:
+       #    timeout: "5 seconds"
+       #    stage: "Test done"
+       #- qa_crowbarsetup:prepareinstallcrowbar:
+       #    timeout: "2 minutes"
+       #- qa_crowbarsetup:installcrowbar:
+       #    timeout: "10 minutes"
+       #    stage: Crowbar installed
+       #    features:
+       #      - admin
+       #- qa_crowbarsetup:allocate:
+       #    tiemout: "5 minutes"
+       #    stage: Nodes allocated
       # - crowbar:batch:proposal:
       #     - database:
       #         stage: "Database proposal installed"
@@ -56,9 +53,16 @@ story:
 
       runners:
         - mkcloud:cleanup:
-            stage: "Leftovers from last run cleaned up"
-            timeout: "30 seconds"
-       #virtsetup:detach_image:
+            stage: "Last built cloud deleted"
+        - virtsetup:create_image:
+            stage: "Image for cloud created"
+            timeout: "10 seconds"
+        - virtsetup:configure_loop_device:
+            stage: "Image attached to loop device"
+            timeout: "10 seconds"
+        - mkcloud:prepare:
+            stage: "Environment prepared by mkcloud"
+            timeout: "1 minute"
        #virtsetup:create_image:
        #virtsetup:configure_loop_device:
        #mkcloud:prepare:
@@ -74,3 +78,6 @@ story:
        #  features:
        #    <<: *admin
        #    controller:
+       #- mkcloud:cleanup:
+       #    stage: "Leftovers from last run cleaned up"
+       #    timeout: "30 seconds"

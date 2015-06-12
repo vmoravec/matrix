@@ -1,7 +1,7 @@
 namespace :virtsetup do
   desc "Detach image file"
   task :detach_image do
-    virtsetup.detach_story_image
+    virtsetup.detach_image
   end
 
   desc "Create image"

@@ -35,10 +35,11 @@ module Matrix
           "#{command.options.user}@#{remote_host} -> `#{action}`"
         end
 
-      if tracker
-        tracker.command = command_details
-        puts command_details
-      end
+      #TODO if a runner execs multiple commands, only the last one is stored
+      tracker.command = command_details if tracker
+
+      puts " $ #{command_details}"
+
       log.info("Running command #{command_details}")
       command.exec!(action)
     end

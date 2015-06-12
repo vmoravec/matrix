@@ -22,9 +22,9 @@ module Matrix
 
     def exec! action
       bin = "/root/#{COMMAND}"
-      prepare = "source #{bin}; bubu "
+      prepare = "source #{bin}; onadmin_runlist "
       action = prepare << action
-      super
+      super(action)
     end
   end
 end
