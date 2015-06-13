@@ -4,8 +4,9 @@ require 'yaml'
 module Matrix
   class Config
     DIR = "config/"
+    MAIN_FILE = 'main.yml'
+    TARGETS_FILE = "targets.yml"
     STORIES_DIR = "stories/"
-    DEFAULT_FILE = 'default.yml'
     DEFAULT_STORY_DIR = 'default'
     STORY_FILE = "story.yml"
     EXT = '.yml'
@@ -23,6 +24,7 @@ module Matrix
       @files = []
       @raw = ""
       @content = load_default_config
+      load_targets_config
       load_story_configs
       #TODO: Still missing
       load_env_config
@@ -44,7 +46,7 @@ module Matrix
     private
 
     def load_default_config
-      default_config = dir.join(DEFAULT_FILE)
+      default_config = dir.join(MAIN_FILE)
       if !File.exist?(default_config)
         abort "Default config file in '#{default_config}' not found"
       end
@@ -52,6 +54,15 @@ module Matrix
       content = load_content(default_config.to_s)
       content["vendor_dir"] = "vendor/"
       content
+    end
+
+    def load_targets_config
+      targets_config = dir.join(TARGETS_FILE)
+      if !File.exist?(targets_config)
+        abort "Default config file in '#{targets_config}' not found"
+      end
+      files << targets_config
+      content.deep_merge!(load_content(targets_config.to_s))
     end
 
     # Assuming the default config file is already loaded in #content
@@ -123,7 +134,7 @@ module Matrix
 
       content['autoload_config_files'].each do |config_file|
         config_file << EXT unless config_file.to_s.match(/.#{EXT}$/)
-        next if config_file.to_s.match(/\A#{DEFAULT_FILE}$/)
+        next if config_file.to_s.match(/\A#{MAIN_FILE}$/)
 
         if !File.exist?(dir.join( config_file))
           abort "Configuration file #{config_file} does not exist".red

@@ -1,8 +1,3 @@
-git:
-  automation:
-    url: github.com:suse-cloud/automation
-    branch: master
-
 targets:
   # SSH key based authentication
   qa2:
@@ -51,10 +46,3 @@ targets:
         <<: *ssh
       api:
         <<: *api
-cucumber:
-  formats:
-    - pretty: "log/features"
-    - json: "log/features"
-
-timeout:
-  ssh: 5

@@ -1,0 +1,12 @@
+git:
+  automation:
+    url: github.com:suse-cloud/automation
+    branch: master
+
+cucumber:
+  formats:
+    - pretty: "log/features"
+    - json: "log/features"
+
+timeout:
+  ssh: 5

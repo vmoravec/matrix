@@ -35,7 +35,7 @@ module Matrix
           "#{command.options.user}@#{remote_host} -> `#{action}`"
         end
 
-      #TODO if a runner execs multiple commands, only the last one is stored
+      #FIXME if a runner execs multiple commands, only the last one is stored
       tracker.command = command_details if tracker
 
       puts " $ #{command_details}"

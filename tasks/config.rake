@@ -4,9 +4,15 @@ namespace :config do
   task :main do
     require "awesome_print"
     config = {}
-    keys = matrix.config.content.keys.take_while {|key| key != "story" }
+    keys = matrix.config.content.keys.take_while {|key| !["story", "targets"].include?(key) }
     keys.each {|key| config[key] = matrix.config[key] }
     ap config
+  end
+
+  desc "Targets configuration"
+  task :targets do
+    require "awesome_print"
+    ap matrix.config["targets"]
   end
 
   task :all do
