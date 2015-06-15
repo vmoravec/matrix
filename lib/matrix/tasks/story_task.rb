@@ -33,6 +33,10 @@ module Matrix
 
       runner_tasks.each {|runner| runner.invoke }
 
+      success_message = "Story '#{story.name}' has finished successfuly " +
+                        "on target '#{story.target.name}'"
+      log.info(success_message)
+      puts success_message
       story.tracker.success!
     rescue => e
       story.tracker.failure!(e.message)

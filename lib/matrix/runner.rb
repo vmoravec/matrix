@@ -2,14 +2,15 @@ module Matrix
   class Runner
     include Utils::User
 
-    attr_reader :story
-    attr_reader :options
+    attr_reader :bin
     attr_reader :command
     attr_reader :config
-    attr_reader :tracker
+    attr_reader :environment
     attr_reader :gate
-    attr_reader :bin
     attr_reader :log
+    attr_reader :options
+    attr_reader :story
+    attr_reader :tracker
 
     def initialize
       @story = Matrix.current_story || Story.new
@@ -24,6 +25,7 @@ module Matrix
 
     def exec! action
       action = "#{bin} #{action}" if bin
+      action = "#{environment} #{action}" if environment
       action = sudo(action).join if command.is_a?(LocalCommand)
 
       command_details =

@@ -10,6 +10,3 @@ story:
         controller_ceph_hdd_size: 25
         lvm_size: <%= ENV['lvm_size'] || '260G' %>
 
-      runners:
-        <<: *runners
-

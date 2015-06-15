@@ -12,22 +12,26 @@ module Matrix
           LOG_TAG,
           path: Matrix.root.join(LOG_DIR, "mkcloud.log")
         )
-        @command = LocalCommand.new(logger: log)
         @bin = Matrix.config["vendor_dir"] + SCRIPT_DIR + COMMAND
+        @command =
+          if gate.localhost?
+          LocalCommand.new(logger: log)
+        else
+          RemoteCommand.new(
+            ip: gate.ip || gate.fqdn,
+            user: gate.user
+          )
+        end
       end
     end
 
-    def update_mkcloud_config
-      log.info "Updating story config: cloud => #{story.name}"
-      config["cloud"] = story.name
-      config["cloudpv"] = detect_loop_device(story.name) || find_available_loop_device
-      config["cloudbr"] = story.name + "-br"
-      config["virtualcloud"] = story.name
-      config
-    end
-
-    def cleanup
-      exec! "echo hell"
+    def exec! action
+      environment = config["mkcloud"].inject("") do |env, config_pair|
+        key, value = config_pair
+        env << "#{key}=#{value} "
+      end
+      @environment = environment
+      super(action)
     end
 
   end

@@ -1,8 +1,7 @@
 namespace :mkcloud do
   desc "Cleanup leftovers from last run"
   task :cleanup do
-    #mkcloud.exec! :cleanup
-    mkcloud.cleanup
+    mkcloud.exec! :cleanup
   end
 
   desc "Prepare the environment for cloud installation"

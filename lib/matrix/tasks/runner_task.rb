@@ -28,11 +28,8 @@ module Matrix
           tracker.success!
         end
       end
-      success_message = "Story '#{story.name}' has finished successfuly " +
-                        "on target '#{story.target.name}'"
+      success_message = "Runner '#{runner_name}' has finished successfuly"
       log.info(success_message)
-      puts
-      puts success_message
     end
 
     private
@@ -53,6 +50,7 @@ module Matrix
       wait_for(event, max: time) do
         Rake::Task[runner_name].invoke
       end
+      puts
     rescue => err
       log_error(err)
       puts
