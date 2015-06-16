@@ -11,6 +11,7 @@ module Matrix
     attr_reader :options
     attr_reader :story
     attr_reader :tracker
+    attr_reader :native
 
     def initialize
       @story = Matrix.current_story || Story.new
@@ -19,8 +20,10 @@ module Matrix
       @gate = story.current_target.gate
       @config = story.config
       @tracker = story.tracker.runners.last
-      yield
-      raise "Command not defined for runner #{self.class.name}" unless command
+      yield if block_given?
+      if !native
+        raise "Command not defined for runner #{self.class.name}" unless command
+      end
     end
 
     def exec! action
@@ -44,6 +47,12 @@ module Matrix
 
       log.info("Running command #{command_details}")
       command.exec!(action)
+    rescue => err
+      raise if story.task
+      puts err.message
+      puts command.output
+      log.error(err.message)
+      log.error(command.output)
     end
   end
 end
@@ -53,3 +62,4 @@ require "matrix/runners/virtsetup"
 require "matrix/runners/gate"
 require "matrix/runners/qa_crowbarsetup"
 require "matrix/runners/void"
+require "matrix/runners/config"

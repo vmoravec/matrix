@@ -1,11 +1,11 @@
 targets:
-  # Libvirt
+  # Libvirt, lvm and friends
   virtual:
-    desc: "Virtualized environment libvirt"
+    desc: "Virtualized environment with libvirt"
     gate:
       fqdn: localhost
     admin_node: &admin_node
-      ip: 192.168.124.10
+      ip: CAN'T BE BLANK
       ssh:
         user: root
         password: linux

@@ -12,26 +12,22 @@ story:
         image_size: 120G
 
       runners:
+        - mkcloud:cleanup:
+            stage: "Ancient cloud build wiped out"
         - virtsetup:configure_loop_device:
             stage: "/dev/loopX set up"
-            timeout: "10 seconds"
         - virtsetup:configure_image:
             stage: "Image file for deployment ready"
-            timeout: "30 seconds"
         - mkcloud:prepare:
             stage: "Environment prepared for mkcloud"
-            timeout: "5 minutes"
         - mkcloud:setupadmin:
             stage: "Admin node prepared for crowbar installation"
-            timeout: "2 minutes"
         - mkcloud:installcrowbar:
-            stage: Crowbar installed
-            timeout: "15 minutes"
+            stage: "Admin node installed"
             features:
               - admin
         - mkcloud:installnodes:
             stage: "Nodes installed"
-            timeout: "15 minutes"
         - mkcloud:installproposal:
             stage: "Controller node installed"
             timeout: "25 minutes"

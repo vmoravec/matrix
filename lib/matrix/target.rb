@@ -45,7 +45,7 @@ module Matrix
       @desc = options["desc"]
       @gate = Gate.new(options["gate"])
       @admin_node = AdminNode.new(options)
-      @control_node = options["control_node"]
+      @control_node = OpenStruct.new(options["control_node"])
     end
 
     class Gate

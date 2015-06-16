@@ -6,9 +6,10 @@ module Matrix
     DIR = "config/"
     MAIN_FILE = 'main.yml'
     TARGETS_FILE = "targets.yml"
+    STORY_FILE = "story.yml"
     STORIES_DIR = "stories/"
     DEFAULT_STORY_DIR = 'default'
-    STORY_FILE = "story.yml"
+    DEVEL = "development.yml"
     EXT = '.yml'
 
     attr_reader :content
@@ -19,6 +20,8 @@ module Matrix
 
     attr_reader :raw
 
+    attr_reader :devel
+
     def initialize
       @dir = Matrix.root.join(DIR)
       @files = []
@@ -26,6 +29,8 @@ module Matrix
       @content = load_default_config
       load_targets_config
       load_story_configs
+      load_proposal_configs
+      load_devel_config
       #TODO: Still missing
       load_env_config
     end
@@ -51,7 +56,7 @@ module Matrix
         abort "Default config file in '#{default_config}' not found"
       end
       files << default_config
-      content = load_content(default_config.to_s)
+      content = load_content(default_config)
       content["vendor_dir"] = "vendor/"
       content
     end
@@ -62,7 +67,7 @@ module Matrix
         abort "Default config file in '#{targets_config}' not found"
       end
       files << targets_config
-      content.deep_merge!(load_content(targets_config.to_s))
+      content.deep_merge!(load_content(targets_config))
     end
 
     # Assuming the default config file is already loaded in #content
@@ -77,6 +82,23 @@ module Matrix
         load_raw_story(story_config.to_s)
       end
       content.deep_merge!(validate_yaml(raw))
+    end
+
+    def load_devel_config
+      config_file = dir.join(Config::DEVEL)
+      return unless File.exist?(config_file)
+
+      @devel = load_content(config_file)
+      merge!(config_file)
+    end
+
+    def load_proposal_configs
+      config_dir = dir.join(STORIES_DIR)
+      config_dir.children.each do |story|
+        config_file = story.join("proposals.yml")
+        next unless File.exist?(config_file)
+        merge!(config_file)
+      end
     end
 
     def load_default_story config_dir
@@ -115,16 +137,8 @@ module Matrix
       content.deep_merge!(env_config)
     end
 
-    def load_devel_config
-      devel_config = dir.join(DEVELOPMENT_FILE)
-      return unless File.exist?(devel_config)
-
-      merge!(devel_config)
-      autoload_config_files
-    end
-
     def load_content file
-      ::YAML.load(ERB.new(File.read(file)).result) || {}
+      ::YAML.load(ERB.new(File.read(file.to_s)).result) || {}
     rescue Errno::ENOENT
       abort "Configuration file '#{file}' not found"
     end

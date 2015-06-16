@@ -15,10 +15,10 @@ module Matrix
         @bin = Matrix.config["vendor_dir"] + SCRIPT_DIR + COMMAND
         @command =
           if gate.localhost?
-          LocalCommand.new(logger: log, capture: false)
-        else
-          abort "mkcloud is supported only on localhost"
-        end
+            LocalCommand.new(logger: log, capture: false)
+          else
+            abort "mkcloud is supported running only on localhost"
+          end
       end
     end
 

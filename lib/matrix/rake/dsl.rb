@@ -28,6 +28,10 @@ module Rake
       @void ||= Matrix::Void.new
     end
 
+    def config_runner
+      @config_runner ||= Matrix::ConfigRunner.new
+    end
+
     def command
       Matrix.command
     end

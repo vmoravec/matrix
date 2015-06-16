@@ -1,0 +1,7 @@
+story:
+  ceph:
+    virtual:
+      proposals:
+        - barclamp: nova
+          deployment:
+            elements:

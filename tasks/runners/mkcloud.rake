@@ -21,7 +21,7 @@ namespace :mkcloud do
 
   desc "Set up & install controller and compute nodes"
   task :installnodes do
-    mkcloud.exec! "setupcompute instcompute"
+    mkcloud.exec! "setupnodes instnodes"
   end
 
   desc "Install default proposal"
@@ -35,7 +35,7 @@ namespace :mkcloud do
   end
 
   desc "Show the full path to mkcloud script"
-  task :binpath do
-    mkcloud.binpath
+  task :bin do
+    mkcloud.bin
   end
 end

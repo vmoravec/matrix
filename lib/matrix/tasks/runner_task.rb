@@ -2,7 +2,7 @@ require 'timeout'
 
 module Matrix
   class RunnerTask
-    DEFAULT_TIMEOUT = "1 minute"
+    DEFAULT_TIMEOUT = "15 minutes"
 
     attr_reader :features, :runner_name, :log, :environment, :story
     attr_reader :ignore_features
