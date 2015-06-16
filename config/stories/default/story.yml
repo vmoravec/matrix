@@ -33,11 +33,15 @@ story:
             stage: "Nodes installed"
             timeout: "15 minutes"
         - mkcloud:installproposal:
-            stage: Controller node installed
-            timeout: "15 minutes"
+            stage: "Controller node installed"
+            timeout: "25 minutes"
             features:
               - admin
               - controller
+        - mkcloud:testsetup:
+            stage: "Tempest run"
+            timeout: "20 minutes"
+
 
     qa2: &qa2
       mkcloud:
