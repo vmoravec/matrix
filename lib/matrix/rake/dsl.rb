@@ -24,6 +24,10 @@ module Rake
       @qa_crowbar ||= Matrix::QaCrowbarSetup.new
     end
 
+    def void
+      @void ||= Matrix::Void.new
+    end
+
     def command
       Matrix.command
     end
