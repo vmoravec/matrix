@@ -1,4 +1,23 @@
 targets:
+  # Libvirt
+  virtual:
+    desc: "Virtualized environment libvirt"
+    gate:
+      fqdn: localhost
+    admin_node: &admin_node
+      ip: 192.168.124.10
+      ssh:
+        user: root
+        password: linux
+      api:
+        user: crowbar
+        password: crowbar
+    control_node: &control_node
+      ssh:
+        user: root
+        password: linux
+        port: 22
+
   # SSH key based authentication
   qa2:
     desc: "Cloud 2 in rack 19 in server room 2 in Nürnberg"
@@ -9,14 +28,11 @@ targets:
         name: crowbar2
         user: root
     admin_node:
+      <<: *admin_node
       ip: 10.162.24.10
       fqdn: crowbar.cloud2adm.qa.suse.de
-      ssh: &ssh
-        user: root
-        password: linux
-      api: &api
-        user: crowbar
-        password: crowbar
+    control_node:
+      <<: *control_node
 
   # SSH key based authentication
   qa3:
@@ -28,21 +44,8 @@ targets:
         name: crowbar3
         user: root
     admin_node:
+      <<: *admin_node
       ip: 10.162.25.10
       fqdn: crowbar.cloud3adm.qa.suse.de
-      ssh:
-        <<: *ssh
-      api:
-        <<: *api
-
-  virtual:
-    desc: "Virtualized environment libvirt"
-    gate:
-      fqdn: localhost
-
-    admin_node:
-      ip: 192.168.124.10
-      ssh:
-        <<: *ssh
-      api:
-        <<: *api
+    control_node:
+      <<: *control_node
