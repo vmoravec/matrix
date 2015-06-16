@@ -1,7 +1,7 @@
 ---
 story:
   default:
-    desc: "Default setup with linuxbridge as network plugin"
+    desc: "Default setup"
     virtual:
       mkcloud: &mkcloud
         cloudsource: <%= ENV['cloudsource'] || 'develcloud6' %>
@@ -30,12 +30,13 @@ story:
             features:
               - admin
         - mkcloud:installnodes:
-            staget: "Nodes installed"
-            timeout: "10 minutes"
+            stage: "Nodes installed"
+            timeout: "15 minutes"
         - mkcloud:installproposal:
             stage: Controller node installed
-            timeout: "10 minutes"
+            timeout: "15 minutes"
             features:
+              - admin
               - controller
 
     qa2: &qa2

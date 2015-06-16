@@ -87,8 +87,10 @@ module Matrix
           puts " >> Invoking task `feature:#{feature_name}`"
           print " >> #{Matrix.user.login}@#{Matrix.hostname} -> "
           FeatureTask.new(story, feature_name).invoke
+          puts
           feature_tracker.success!
         rescue => err
+          puts
           log_error(err)
           feature_tracker.failure!(err.message)
           tracker.failure!("Feature '#{feature_name}' failed: #{err.message}")
