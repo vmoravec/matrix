@@ -23,4 +23,9 @@ namespace :virtsetup do
   task :modprobe_loop do
     virtsetup.modprobe_loop
   end
+
+  desc "Create image"
+  task :create_image do
+    virtsetup.create_image
+  end
 end

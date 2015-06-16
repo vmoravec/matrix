@@ -2,13 +2,14 @@ module Matrix
   class LocalCommand
     Result = Struct.new(:success?, :output, :exit_code, :host)
 
-    attr_reader :log, :environment
+    attr_reader :log, :environment, :capture
 
     attr_accessor :tracker
 
-    def initialize tag=nil, logger: nil
+    def initialize tag=nil, logger: nil, capture: true
       @log = logger || BaseLogger.new(tag || "LOCAL")
       @environment = {}
+      @capture = capture
     end
 
     def exec! command_name, *args
@@ -19,9 +20,7 @@ module Matrix
 
       IO.popen(command, :err=>[:child, :out]) do |lines|
         lines.each do |line|
-          result.output << line
-          next unless log.debug?
-
+          result.output << line if capture
           log_command_output(line)
         end
       end
@@ -58,7 +57,7 @@ module Matrix
       when /error/i
         log.error(line)
       else
-        log.debug(line)
+        log.info(line)
       end
     end
   end

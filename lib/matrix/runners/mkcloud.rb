@@ -15,7 +15,7 @@ module Matrix
         @bin = Matrix.config["vendor_dir"] + SCRIPT_DIR + COMMAND
         @command =
           if gate.localhost?
-          LocalCommand.new(logger: log)
+          LocalCommand.new(logger: log, capture: false)
         else
           RemoteCommand.new(
             ip: gate.ip || gate.fqdn,

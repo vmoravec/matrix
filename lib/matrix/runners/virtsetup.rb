@@ -23,7 +23,7 @@ module Matrix
           )
         end
       end
-      @image_file = Matrix.root.join(TEMP_DIR, IMAGE).to_s
+      @image_file = Pathname.new(Matrix.root.join(TEMP_DIR, IMAGE))
       @image_size = config["virtsetup"]["image_size"]
     end
 
@@ -34,7 +34,7 @@ module Matrix
         log.warn(message)
         puts message
       else
-        losetup(find_available_loop_device, image_file)
+        losetup(find_available_loop_device, image_file.realpath)
       end
     end
 
@@ -46,7 +46,9 @@ module Matrix
     end
 
     def detect_loop_device
-      result = losetup("-j", image_file).output.split(":").first
+      create_image unless File.exist?(image_file)
+
+      result = losetup("-j", image_file.realpath).output.split(":").first
       puts result unless story.task
       result
     end
@@ -55,12 +57,18 @@ module Matrix
       exec!(*sudo("modprobe loop"))
     end
 
+    def create_image
+      message = "Creating image file in `#{image_file}"
+      puts message
+      log.info(message)
+      exec!("qemu-img create -f raw #{image_file} #{image_size}")
+    end
+
     def configure_image
       if File.exist?(image_file)
         create_filesystem
       else
-        puts "   Creating image file in `#{image_file}"
-        exec!("qemu-img create -f raw #{image_file} #{image_size}")
+        create_image
         create_filesystem
       end
       update_mkcloud_config("cloudpv" => detect_loop_device)
@@ -74,7 +82,7 @@ module Matrix
 
     def create_filesystem
       puts "   Creating new filesystem in `#{image_file}"
-      exec!("mkfs -t ext4 #{image_file}")
+      exec!("mkfs -t ext4 #{image_file.realpath}")
     end
 
     def losetup *args
