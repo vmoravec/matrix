@@ -6,6 +6,7 @@ module Matrix
       end
 
       def load_cct!
+        Rake::Task.tasks.each(&:reenable)
         return if cct_loaded?
 
         Rake::TaskManager.record_task_metadata = true
@@ -21,7 +22,6 @@ module Matrix
         ENV["nocolors"] = "true"
         Dir.chdir(Matrix.cct.gem_dir) do
           Rake::Task[task_name].invoke
-          Rake::Task[task_name].reenable
         end
       end
 
@@ -29,7 +29,8 @@ module Matrix
 
       def update_cct_config story
         cct_config = {
-          "admin_node" => story.current_target.admin_node.credentials
+          "admin_node" => story.current_target.admin_node.credentials,
+          "control_node" => story.current_target.control_node
         }
         cct_config.merge!("cucumber" => Matrix.config["cucumber"])
         ENV["cct_config"] = cct_config.to_yaml

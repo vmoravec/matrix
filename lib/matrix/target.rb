@@ -38,13 +38,14 @@ module Matrix
   end
 
   class Target
-    attr_reader :name, :desc, :gate, :admin_node
+    attr_reader :name, :desc, :gate, :admin_node, :control_node
 
     def initialize name, options
       @name = name
       @desc = options["desc"]
       @gate = Gate.new(options["gate"])
       @admin_node = AdminNode.new(options)
+      @control_node = options["control_node"]
     end
 
     class Gate
