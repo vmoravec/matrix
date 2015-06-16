@@ -17,10 +17,7 @@ module Matrix
           if gate.localhost?
           LocalCommand.new(logger: log, capture: false)
         else
-          RemoteCommand.new(
-            ip: gate.ip || gate.fqdn,
-            user: gate.user
-          )
+          abort "mkcloud is supported only on localhost"
         end
       end
     end

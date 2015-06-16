@@ -6,7 +6,7 @@ story:
       mkcloud: &mkcloud
         cloudsource: <%= ENV['cloudsource'] || 'develcloud6' %>
         networkingplugin: <%= ENV['networkingplugin'] || 'linuxbridge' %>
-        artifacts_dir: "tmp/"
+        artifacts_dir: "log/"
 
       virtsetup:
         image_size: 120G
