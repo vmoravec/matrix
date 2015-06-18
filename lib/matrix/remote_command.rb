@@ -8,20 +8,22 @@ module Matrix
 
     Result = Struct.new(:success?, :output, :exit_code, :host)
 
-    attr_reader :session, :options, :log, :gateway, :proxy
+    attr_reader :session, :options, :log, :gateway, :proxy, :capture
     attr_accessor :target
 
     def initialize opts
       @gateway = opts[:gateway]
       opts.merge!(gateway) if gateway
       @proxy = set_ssh_proxy(opts[:proxy]) if opts[:proxy]
-      @log = BaseLogger.new("SSH")
+      @log = BaseLogger.new("SSH", level: ::Logger::WARN)
       @options = OpenStruct.new
+      @capture = opts[:capture].nil? ? true : opts[:capture]
       construct_options(opts)
       validate_options
     end
 
     def exec! command, *params
+      log.base.level = ::Logger::WARN unless log.warn?
       connect!
       host_ip = gateway ? target.ip : options.ip
       params = params.flatten
@@ -31,11 +33,15 @@ module Matrix
       result = Result.new(false, "", 1000, host_ip)
       open_session_channel do |channel|
         channel.exec("#{environment}#{full_command}") do |p, d|
-          channel.on_close do
-            log.info("Running command `#{full_command}` on remote host #{host_ip}")
+          log.always("Running command `#{full_command}` on remote host #{host_ip}")
+          channel.on_data do |p,data|
+            log.always(data)
+            result.output << data if capture
           end
-          channel.on_data {|p,data| result.output << data }
-          channel.on_extended_data {|_,_,data| result.output << data }
+          channel.on_extended_data do |_,_,data|
+            log.always(data)
+            result.output << data if capture
+          end
           channel.on_request("exit-status") {|p,data| result.exit_code = data.read_long}
         end
       end
@@ -46,6 +52,8 @@ module Matrix
         raise RemoteCommandFailed.new(full_command, result)
       end
       result
+    ensure
+      log.base.level = Matrix.verbose? ? ::Logger::DEBUG : ::Logger::INFO
     end
 
     def connect!
@@ -144,7 +152,7 @@ module Matrix
       export_env.prepend("export ") unless export_env.empty?
       source_env = source_files.map {|file| "source #{file}; "}.join
       env = source_env + export_env
-      log.info("Updating environment with `#{env}`")
+      log.always("Updating environment with `#{env}`")
       env
     end
 

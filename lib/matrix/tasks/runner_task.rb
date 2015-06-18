@@ -4,6 +4,8 @@ module Matrix
   class RunnerTask
     DEFAULT_TIMEOUT = "15 minutes"
 
+    include Utils::Helpers
+
     attr_reader :features, :runner_name, :log, :environment, :story
     attr_reader :ignore_features
     attr_reader :target, :runner_options
@@ -20,8 +22,6 @@ module Matrix
     def invoke
       extract_options.each do |params|
         tracker = Tracker.new(:runner, runner_name)
-        story.tracker.runners << tracker
-        update_tracker(tracker, params)
         current_story(params) do
           invoke_runner(tracker, params)
           invoke_features(tracker, params)
@@ -44,8 +44,10 @@ module Matrix
     end
 
     def invoke_runner tracker, params
+      story.tracker.runners << tracker unless params.is_a?(Array)
+      update_tracker(tracker, params)
       event = params["stage"] || "(no target description was given)"
-      time = params["timeout"].to_s || DEFAULT_TIMEOUT
+      time = params["timeout"] || DEFAULT_TIMEOUT
       puts ">> Invoking `#{runner_name}` with timeout #{time} to make '#{event}'"
       wait_for(event, max: time) do
         Rake::Task[runner_name].invoke
@@ -106,7 +108,7 @@ module Matrix
 
     def update_tracker tracker, params
       tracker.stage = params["stage"]
-      tracker.timeout = params["timeout"]
+      tracker.timeout = params["timeout"] || DEFAULT_TIMEOUT
     end
 
     def log_error err
@@ -135,32 +137,6 @@ module Matrix
         []
       else
         abort "Runner config section must be a Hash or nil, got #{params.class}"
-      end
-    end
-
-    def wait_for event, options
-      period, period_units = options[:max].split
-      timeout_time = convert_to_seconds(period, period_units)
-      log.info("Setting timeout for '#{event}' to #{options[:max]}")
-      Timeout.timeout(timeout_time) do
-        yield
-      end
-    rescue Timeout::Error
-      message = "Stage '#{event}' was not reached due to expired timeout (#{options[:max]})"
-      raise message
-    end
-
-    def convert_to_seconds period, units
-      case units
-      when /minute/
-        period.to_i * 60
-      when /second/
-        period.to_i
-      # when no units are specified, expect seconds were meant
-      when nil
-        period.to_i
-      else
-        raise "Only minutes or seconds are allowed for timeout specification"
       end
     end
 

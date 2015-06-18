@@ -2,7 +2,7 @@ module Matrix
   class LocalCommand
     Result = Struct.new(:success?, :output, :exit_code, :host)
 
-    attr_reader :log, :environment, :capture
+    attr_reader :log, :environment, :capture, :result
 
     attr_accessor :tracker
 
@@ -16,7 +16,7 @@ module Matrix
       command = "#{command_name} #{args.join(" ")}".strip
 
       log.info("Running command `#{command}`")
-      result = Result.new(false, "", 1000, Matrix.hostname)
+      @result = Result.new(false, "", 1000, Matrix.hostname)
 
       IO.popen(command, :err=>[:child, :out]) do |lines|
         lines.each do |line|
@@ -41,7 +41,6 @@ module Matrix
     rescue Errno::ENOENT => e
       result.output << "Command `#{command_name}` not found"
       log.error("#{result.host}: #{result.output}")
-      raise LocalCommandFailed.new(result)
     end
 
     def update_env env_hash

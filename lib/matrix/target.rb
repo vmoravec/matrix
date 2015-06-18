@@ -59,7 +59,7 @@ module Matrix
 
         @admin_domain = OpenStruct.new(
           name: params["admin_domain"]["name"],
-          user: params["admin_domain"]["user"]
+          user: params["admin_domain"]["user"],
         )
       end
 

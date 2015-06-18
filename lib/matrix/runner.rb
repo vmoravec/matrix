@@ -1,6 +1,7 @@
 module Matrix
   class Runner
     include Utils::User
+    include Utils::Helpers
 
     attr_reader :bin
     attr_reader :command
@@ -16,7 +17,7 @@ module Matrix
     def initialize
       @story = Matrix.current_story || Story.new
       story.finalize!
-      @log = Matrix.logger
+      @log ||= Matrix.logger
       @gate = story.current_target.gate
       @config = story.config
       @tracker = story.tracker.runners.last
@@ -49,17 +50,18 @@ module Matrix
       command.exec!(action)
     rescue => err
       raise if story.task
+      puts command.result.output
       puts err.message
-      puts command.output
       log.error(err.message)
-      log.error(command.output)
+      log.error(command.result.output)
     end
   end
 end
 
 require "matrix/runners/mkcloud"
-require "matrix/runners/virtsetup"
+require "matrix/runners/virsetup"
 require "matrix/runners/gate"
 require "matrix/runners/qa_crowbarsetup"
 require "matrix/runners/void"
 require "matrix/runners/config"
+require "matrix/runners/admin_domain"

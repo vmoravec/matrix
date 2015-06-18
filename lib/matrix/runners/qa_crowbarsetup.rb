@@ -1,5 +1,5 @@
 module Matrix
-  class QaCrowbarSetup < Runner
+  class QaCrowbarSetupRunner < Runner
     COMMAND = "qa_crowbarsetup.sh"
 
     def initialize
@@ -15,12 +15,17 @@ module Matrix
             proxy: {
               "user" => gate.user,
               "fqdn" => gate.fqdn
-            }
+            },
+            capture: false
           )
       end
     end
 
     def exec! action
+      @environment = config["mkcloud"].inject("") do |env, config_pair|
+        key, value = config_pair
+        env << "export #{key}=#{value}; "
+      end
       bin = "/root/#{COMMAND}"
       prepare = "source #{bin}; onadmin_runlist "
       super(prepare << action.to_s)

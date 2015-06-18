@@ -3,7 +3,7 @@ story:
     desc: Internal ceph deployment
     qa2:
       mkcloud:
-        <<: *mkcloud
+        <<: *default_mkcloud
         nodenumber: <%= ENV['nodenumber'] || 4 %>
         cephvolumenumber: <%= ENV['cephvolumenumber'] || 1 %>
         cephvolume_hdd_size: 21

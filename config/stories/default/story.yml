@@ -3,21 +3,19 @@ story:
   default:
     desc: "Default setup"
     virtual:
-      mkcloud: &mkcloud
+      mkcloud: &default_mkcloud
         cloudsource: <%= ENV['cloudsource'] || 'develcloud6' %>
         networkingplugin: <%= ENV['networkingplugin'] || 'linuxbridge' %>
         artifacts_dir: "log/"
 
-      virtsetup:
+      virsetup:
         image_size: 120G
 
       runners:
         - mkcloud:cleanup:
             stage: "Ancient cloud build wiped out"
-        - virtsetup:configure_loop_device:
-            stage: "/dev/loopX set up"
-        - virtsetup:configure_image:
-            stage: "Image file for deployment ready"
+        - virsetup:configure:
+            stage: "Setup for virtual deployment ready"
         - mkcloud:prepare:
             stage: "Environment prepared for mkcloud"
         - mkcloud:setupadmin:
@@ -29,7 +27,7 @@ story:
         - mkcloud:installnodes:
             stage: "Nodes installed"
         - mkcloud:installproposal:
-            stage: "Controller node installed"
+            stage: "Controller node and compute node installed"
             timeout: "25 minutes"
             features:
               - admin
@@ -41,38 +39,39 @@ story:
 
     qa2: &qa2
       mkcloud:
+        <<: *default_mkcloud
+        cloud: qa2
 
       runners:
         - gate:prepare_admin:
-            timeout: "1 minute"
-            stage: "Admin node prepared"
-       #- qa_crowbarsetup:test:
-       #    timeout: "5 seconds"
-       #    stage: "Test done"
-       #- qa_crowbarsetup:prepareinstallcrowbar:
-       #    timeout: "2 minutes"
-       #- qa_crowbarsetup:installcrowbar:
-       #    timeout: "10 minutes"
-       #    stage: Crowbar installed
-       #    features:
-       #      - admin
-       #- qa_crowbarsetup:allocate:
-       #    tiemout: "5 minutes"
-       #    stage: Nodes allocated
-      # - crowbar:batch:proposal:
-      #     - database:
-      #         stage: "Database proposal installed"
-      #         timeout: "5 minutes"
-      #     - nova:
-      #         timeout: "30 minutes"
-      #         stage: "Nova proposal installed"
-      #         features:
-      #           - admin
-      #           - controller
-      #     - tempest:
-      #         timeout: "20 minutes"
-      #         stage: "Tempest proposal installed"
+            stage: "Image for admin node prepared"
+        - admin_domain:prepare:
+            stage: "Admin libvirt domain prepared"
+        - qa_crowbarsetup:prepareinstallcrowbar:
+           timeout: "2 minutes"
+        - qa_crowbarsetup:installcrowbar:
+           timeout: "10 minutes"
+           stage: Crowbar installed
+           features:
+             - admin
+        - qa_crowbarsetup:allocate:
+           timeout: "20 minutes"
+           stage: Nodes allocated
+        - crowbar:batch:proposal:
+           - barclamp: database
+           - barclamp: nova
+             timeout: "30 minutes"
+             features:
+               - admin
+               - controller
+               - users
+               - images
+           - barclamp: tempest
+             timeout: "20 minutes"
 
     qa3:
       <<: *qa2
+      mkcloud:
+        <<: *default_mkcloud
+        cloud: qa3
 

@@ -27,7 +27,11 @@ namespace :target do
   desc "Test connection to target gate by `ping` and `ssh`"
   task :test do
     target = detect_target
-    if target.gate
+    if target.gate && !target.gate.localhost?
+      remote = Matrix::RemoteCommand.new(
+        ip: target.gate.ip || target.gate.fqdn,
+        user: target.gate.user
+      )
       puts "Testing ping to gate #{target.name} ..."
       ping = "ping -q -c 1 -W 5 #{target.gate.ip || target.gate.fqdn}"
       print ping
@@ -38,7 +42,7 @@ namespace :target do
 
       print "Testing ssh into gate #{target.name} ..."
       rescue_from_failure do
-        target.gate.exec!("echo 'This is a test'")
+        remote.exec!("echo 'This is a test'")
       end
       puts "    Success!"
 

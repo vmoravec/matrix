@@ -1,5 +1,5 @@
 module Matrix
-  class Mkcloud < Runner
+  class MkcloudRunner < Runner
     LOG_TAG = "MKCLOUD"
     COMMAND = "mkcloud"
     SCRIPT_DIR = "automation/scripts/"
@@ -29,6 +29,12 @@ module Matrix
       end
       @environment = environment
       super(action)
+    end
+
+    def cleanup
+      virsetup = VirsetupRunner.new
+      exec!(:cleanup) if virsetup.detect_loop_device
+      virsetup.detach_image
     end
 
   end

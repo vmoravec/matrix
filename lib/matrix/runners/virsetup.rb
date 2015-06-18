@@ -1,7 +1,7 @@
 module Matrix
-  class Virtsetup < Runner
+  class VirsetupRunner < Runner
 
-    LOG_TAG = "VIRTSETUP"
+    LOG_TAG = "VIRSETUP"
     LOSETUP_BIN = "/sbin/losetup"
     MODPROBE_BIN = "/sbin/modprobe"
     TEMP_DIR = "tmp/"
@@ -24,10 +24,17 @@ module Matrix
         end
       end
       @image_file = Pathname.new(Matrix.root.join(TEMP_DIR, IMAGE))
-      @image_size = config["virtsetup"]["image_size"]
+      @image_size = config["virsetup"]["image_size"]
+    end
+
+    def configure
+      configure_image
+      configure_loop_device
+      update_mkcloud_config("cloudpv" => detect_loop_device)
     end
 
     def configure_loop_device
+      modprobe_loop
       device_info = detect_loop_device
       if device_info
         message = "   Image #{image_file} is already attached to #{device_info}"
@@ -46,15 +53,13 @@ module Matrix
     end
 
     def detect_loop_device
-      create_image unless File.exist?(image_file)
-
       result = losetup("-j", image_file.realpath).output.split(":").first
       puts result unless story.task
       result
     end
 
     def modprobe_loop
-      exec!(*sudo("modprobe loop"))
+      exec!("modprobe loop")
     end
 
     def create_image
@@ -71,7 +76,6 @@ module Matrix
         create_image
         create_filesystem
       end
-      update_mkcloud_config("cloudpv" => detect_loop_device)
     end
 
     def update_mkcloud_config options

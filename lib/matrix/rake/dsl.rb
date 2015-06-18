@@ -9,19 +9,19 @@ module Rake
     end
 
     def mkcloud
-      @mkcloud ||= Matrix::Mkcloud.new
+      @mkcloud ||= Matrix::MkcloudRunner.new
     end
 
-    def virtsetup
-      @virtsetup ||= Matrix::Virtsetup.new
+    def virsetup
+      @virsetup ||= Matrix::VirsetupRunner.new
     end
 
     def gate
-      @gate ||= Matrix::Gate.new
+      @gate ||= Matrix::GateRunner.new
     end
 
     def qa_crowbarsetup
-      @qa_crowbar ||= Matrix::QaCrowbarSetup.new
+      @qa_crowbar ||= Matrix::QaCrowbarSetupRunner.new
     end
 
     def void
@@ -32,12 +32,20 @@ module Rake
       @config_runner ||= Matrix::ConfigRunner.new
     end
 
+    def admin_domain
+      @admin_domain ||= Matrix::AdminDomainRunner.new
+    end
+
     def command
       Matrix.command
     end
 
     def targets
       Matrix.targets
+    end
+
+    def log
+      Matrix.logger
     end
 
     def wait_for event, options
