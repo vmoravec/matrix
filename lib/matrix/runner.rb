@@ -13,6 +13,7 @@ module Matrix
     attr_reader :story
     attr_reader :tracker
     attr_reader :native
+    attr_reader :recorder
 
     def initialize
       @story = Matrix.current_story || Story.new
@@ -65,3 +66,4 @@ require "matrix/runners/qa_crowbarsetup"
 require "matrix/runners/void"
 require "matrix/runners/config"
 require "matrix/runners/admin_domain"
+require "matrix/runners/tempest"

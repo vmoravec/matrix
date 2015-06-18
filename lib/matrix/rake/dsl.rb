@@ -36,6 +36,10 @@ module Rake
       @admin_domain ||= Matrix::AdminDomainRunner.new
     end
 
+    def tempest
+      @tempest ||= Matrix::TempestRunner.new
+    end
+
     def command
       Matrix.command
     end

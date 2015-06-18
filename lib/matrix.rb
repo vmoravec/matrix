@@ -19,6 +19,7 @@ require "matrix/tasks/story_task"
 require "matrix/tasks/runner_task"
 require "matrix/tasks/feature_task"
 require "matrix/runner"
+require "matrix/recorder"
 
 module Matrix
   LOG_TAG = "MATRIX"

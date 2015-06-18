@@ -36,11 +36,13 @@ module Matrix
           log.always("Running command `#{full_command}` on remote host #{host_ip}")
           channel.on_data do |p,data|
             log.always(data)
-            result.output << data if capture
+            recorder.capture(data) if recorder
+            result.output << data  if capture
           end
           channel.on_extended_data do |_,_,data|
             log.always(data)
-            result.output << data if capture
+            recorder.capture(data) if recorder
+            result.output << data  if capture
           end
           channel.on_request("exit-status") {|p,data| result.exit_code = data.read_long}
         end
