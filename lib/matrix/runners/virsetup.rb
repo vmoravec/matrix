@@ -53,7 +53,8 @@ module Matrix
     end
 
     def detect_loop_device
-      result = losetup("-j", image_file.realpath).output.split(":").first
+      path = File.exist?(image_file) ? image_file.realpath : image_file
+      result = losetup("-j", path).output.split(":").first
       puts result unless story.task
       result
     end
