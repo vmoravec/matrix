@@ -24,6 +24,7 @@ story:
             stage: "Admin node prepared for crowbar installation"
         - mkcloud:installcrowbar:
             stage: "Admin node installed"
+            timeout: "20 minutes"
             features:
               - admin
         - mkcloud:installnodes:

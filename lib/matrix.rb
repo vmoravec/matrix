@@ -38,7 +38,7 @@ module Matrix
       @root = Pathname.new(root_dir)
       @config = Config.new
       @user = LocalUser.new
-      @hostname = `hostname -f 2>&1`.strip rescue "localhost"
+      @hostname = set_hostname
       @log_path = log_path || root.join(LOG_DIR, LOG_FILENAME)
       @logger = logger || BaseLogger.new(
         LOG_TAG, verbose: verbose?, path: @log_path
@@ -73,9 +73,48 @@ module Matrix
         load task
       end
     end
+
+    private
+
+    def set_hostname
+      hostname = `hostname -f`
+      return hostname if $?.exitstatus.zero?
+
+      "localhost"
+    end
   end
 
-  class LocalUser  < ::Cct::LocalUser; end
+  class LocalUser
+    extend Forwardable
+
+    def_delegators :@info, :uid, :gid
+
+    attr_reader :login, :name, :homedir
+
+    def initialize
+      if Process.uid.zero?
+        @login = "root"
+        @name = "root"
+        @homedir = "/root/"
+      else
+        @login = Etc.getlogin
+        @info = Etc.getpwnam(login)
+        @name = detect_name
+        @homedir = @info.dir
+      end
+    end
+
+    def root?
+      Process.uid.zero?
+    end
+
+    private
+
+    def detect_name
+      name = @info.gecos.split(',').first
+      name.to_s.empty? ? login : name
+    end
+  end
 end
 
 
