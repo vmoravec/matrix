@@ -1,7 +1,7 @@
 module Matrix
   class ConfigRunner < Runner
     def initialize
-      @native = true
+      @type = :native
       super
     end
 

@@ -2,14 +2,15 @@ module Matrix
   class LocalCommand
     Result = Struct.new(:success?, :output, :exit_code, :host)
 
-    attr_reader :log, :environment, :capture, :result
+    attr_reader :log, :environment, :capture, :result, :recorder
 
     attr_accessor :tracker
 
-    def initialize tag=nil, logger: nil, capture: true
+    def initialize tag=nil, logger: nil, capture: true, recorder: nil
       @log = logger || BaseLogger.new(tag || "LOCAL")
       @environment = {}
       @capture = capture
+      @recorder = recorder
     end
 
     def exec! command_name, *args
@@ -20,7 +21,8 @@ module Matrix
 
       IO.popen(command, :err=>[:child, :out]) do |lines|
         lines.each do |line|
-          result.output << line if capture
+          recorder.capture(line) if recorder
+          result.output << line  if capture
           log_command_output(line)
         end
       end
@@ -41,6 +43,8 @@ module Matrix
     rescue Errno::ENOENT => e
       result.output << "Command `#{command_name}` not found"
       log.error("#{result.host}: #{result.output}")
+    ensure
+      recorder.dump_data if recorder
     end
 
     def update_env env_hash

@@ -8,7 +8,7 @@ module Matrix
 
     Result = Struct.new(:success?, :output, :exit_code, :host)
 
-    attr_reader :session, :options, :log, :gateway, :proxy, :capture
+    attr_reader :session, :options, :log, :gateway, :proxy, :capture, :recorder
     attr_accessor :target
 
     def initialize opts
@@ -18,6 +18,7 @@ module Matrix
       @log = BaseLogger.new("SSH", level: ::Logger::WARN)
       @options = OpenStruct.new
       @capture = opts[:capture].nil? ? true : opts[:capture]
+      @recorder = opts[:recorder]
       construct_options(opts)
       validate_options
     end
@@ -49,6 +50,7 @@ module Matrix
       end
       session.loop unless gateway
       result[:success?] = result.exit_code.zero?
+      recorder.dump_data if recorder
       if !result.success?
         log.error(result.output)
         raise RemoteCommandFailed.new(full_command, result)

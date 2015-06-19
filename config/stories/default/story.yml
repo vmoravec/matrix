@@ -6,6 +6,8 @@ story:
       mkcloud: &default_mkcloud
         cloudsource: <%= ENV['cloudsource'] || 'develcloud6' %>
         networkingplugin: <%= ENV['networkingplugin'] || 'linuxbridge' %>
+        nodenumberlonelynode: <%= ENV['nodenumberlonelynode'] %>
+        nodenumber: <%= ENV['nodenumber'] %>
         artifacts_dir: "log/"
 
       virsetup:
@@ -32,7 +34,7 @@ story:
             features:
               - admin
               - controller
-        - mkcloud:testsetup:
+        - tempest:run:
             stage: "Tempest run"
             timeout: "20 minutes"
 

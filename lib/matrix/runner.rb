@@ -12,10 +12,9 @@ module Matrix
     attr_reader :options
     attr_reader :story
     attr_reader :tracker
-    attr_reader :native
-    attr_reader :recorder
+    attr_reader :type
 
-    def initialize
+    def initialize options={}
       @story = Matrix.current_story || Story.new
       story.finalize!
       @log ||= Matrix.logger
@@ -23,8 +22,8 @@ module Matrix
       @config = story.config
       @tracker = story.tracker.runners.last
       yield if block_given?
-      if !native
-        raise "Command not defined for runner #{self.class.name}" unless command
+      if !command && (type != :native || type != :delegated)
+        raise "Command not defined for runner #{self.class.name}"
       end
     end
 

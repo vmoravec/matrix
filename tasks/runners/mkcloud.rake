@@ -29,11 +29,6 @@ namespace :mkcloud do
     mkcloud.exec! "proposal"
   end
 
-  desc "Set up and run tempest"
-  task :testsetup do
-    mkcloud.exec! "testsetup"
-  end
-
   desc "Show the full path to mkcloud script"
   task :bin do
     mkcloud.bin

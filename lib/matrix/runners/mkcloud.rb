@@ -6,16 +6,17 @@ module Matrix
 
     attr_reader :bin, :log
 
-    def initialize
+    def initialize recorder: nil, logger: nil
+      @recorder = recorder
       super do
-        @log = BaseLogger.new(
+        @log = logger || BaseLogger.new(
           LOG_TAG,
           path: Matrix.root.join(LOG_DIR, "mkcloud.log")
         )
         @bin = Matrix.config["vendor_dir"] + SCRIPT_DIR + COMMAND
         @command =
           if gate.localhost?
-            LocalCommand.new(logger: log, capture: false)
+            LocalCommand.new(logger: log, capture: false, recorder: recorder)
           else
             abort "mkcloud is supported running only on localhost"
           end
