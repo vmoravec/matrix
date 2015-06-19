@@ -61,7 +61,10 @@ module Matrix
 
     def dump_data
       parse
-      puts results.to_json
+      File.write(
+        Matrix.root.join(Matrix::LOG_DIR, "tempest.json"),
+        results.to_json
+      )
     end
   end
 end
