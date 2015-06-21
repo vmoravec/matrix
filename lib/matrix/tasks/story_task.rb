@@ -26,13 +26,12 @@ module Matrix
 
     def run_story
       log.info("Launching story '#{story.name}:#{story.desc}' for target '#{story.current_target.name}'")
-      runner_tasks = story.runners.map do |runner_details|
-        story.runner_options = runner_details
+      runner_tasks = StoryFilters.new.runners.each do |runner_options|
+        story.runner_options = runner_options
         RunnerTask.new(story)
       end
 
       runner_tasks.each {|runner| runner.invoke }
-
       success_message = "Story '#{story.name}' has finished successfuly " +
                         "on target '#{story.target.name}'"
       log.info(success_message)
@@ -86,6 +85,73 @@ module Matrix
         abort "No configuration found for story '#{story.name}'" if result.nil?
 
         result
+      end
+
+      class StoryFilters
+        FILTERS = %w( start stop )
+
+        attr_reader :filters
+
+        def initialize
+          @filters = FILTERS.map do |filter|
+            next unless ENV[filter]
+
+            Filter.new(filter, ENV[filter])
+          end.compact
+        end
+
+        def present?
+          !filters.empty?
+        end
+
+        def runners
+          all_runners = story.runners.map {|r| r.to_a.first.first } # get only the runner name
+          started = all_runners.drop_while {|r| r !=  list(:start).runners.first }
+          filtered = started - list(:stop).runners
+          story.runners.select {|r| filtered.include?(r.to_a.first.first) }
+        end
+
+        def list name
+          filters.find {|f| f.name == name.to_s } || []
+        end
+
+        class Filter < Struct.new(:name, :value)
+          def runners
+            case name
+            when "start"
+              extract_started_runners
+            when "stop"
+              extract_stopped_runners
+            end
+          end
+
+          private
+
+          def extract_started_runners
+            started = false
+            story.runners.map do |runner|
+              runner_name, _ = runner.to_a.first
+              if runner_name == filter.value
+                started = true
+              end
+
+              runner_name if started
+            end.compact
+          end
+
+          def extract_stopped_runners
+            stopped = false
+            story.runners.map do |runner|
+              runner_name, _ = runner.to_a.first
+              if filter.value == runner_name
+                stopped = true
+                next
+              end
+              runner_name if stopped
+            end.compact
+          end
+        end
+
       end
     end
   end

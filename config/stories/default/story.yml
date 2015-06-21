@@ -51,26 +51,29 @@ story:
         - admin_domain:prepare:
             stage: "Admin libvirt domain prepared"
         - qa_crowbarsetup:prepareinstallcrowbar:
-           timeout: "2 minutes"
+            timeout: "2 minutes"
+            stage: "Crowbar installation prepared"
         - qa_crowbarsetup:installcrowbar:
-           timeout: "10 minutes"
-           stage: Crowbar installed
-           features:
-             - admin
+            stage: "Crowbar installed"
+            features:
+              - admin
         - qa_crowbarsetup:allocate:
-           timeout: "20 minutes"
-           stage: Nodes allocated
-        - crowbar:batch:proposal:
+            stage: "Nodes allocated"
+        - qa_crowbarsetup:waitcompute:
+            stage: "Nodes ready for barclamp deployment"
+        - qa_crowbarsetup:proposal:
+            stage: "Proposals installed"
+        - crowbar:batch:
            - barclamp: database
-           - barclamp: nova
-             timeout: "30 minutes"
-             features:
+             features: &basic_features
                - admin
                - controller
                - users
                - images
+           - barclamp: nova
+             features:
+               <<: *basic_features
            - barclamp: tempest
-             timeout: "20 minutes"
 
     qa3:
       <<: *qa2

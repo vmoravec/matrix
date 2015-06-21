@@ -21,11 +21,8 @@ module Matrix
 
     def invoke
       extract_options.each do |params|
-        tracker = Tracker.new(:runner, runner_name)
         current_story(params) do
-          invoke_runner(tracker, params)
-          invoke_features(tracker, params)
-          tracker.success!
+          invoke_runner(params)
         end
       end
       success_message = "Runner '#{runner_name}' has finished successfuly"
@@ -43,9 +40,29 @@ module Matrix
       Matrix.current_story = nil
     end
 
-    def invoke_runner tracker, params
-      story.tracker.runners << tracker unless params.is_a?(Array)
-      update_tracker(tracker, params)
+    def invoke_runner params
+      # Params in an array means there is a sequence of the same runner comming
+      if !params.is_a?(Array)
+        params.each do |runner|
+          tracker = Tracker.new(:runner, runner_name)
+          invoke_runner_command(tracker, params)
+          invoke_features(tracker, params)
+          tracker.success!
+        end
+        story.tracker.runners << tracker
+        update_tracker(tracker, params)
+      else
+        tracker = Tracker.new(:runner, runner_name)
+        invoke_runner_command(tracker, params)
+        invoke_features(tracker, params)
+        tracker.success!
+      end
+      puts
+    rescue => err
+      rescue_runner_errors(err, tracker)
+    end
+
+    def invoke_runner_command tracker, params
       event = params["stage"] || "(no target description was given)"
       time = params["timeout"] || DEFAULT_TIMEOUT
       puts ">> Invoking `#{runner_name}` with timeout #{time} to make '#{event}'"
@@ -53,8 +70,11 @@ module Matrix
         Rake::Task[runner_name].invoke
         Rake::Task[runner_name].reenable
       end
-      puts
     rescue => err
+      rescue_runner_errors(err, tracker)
+    end
+
+    def rescue_runner_errors err, tracker
       log_error(err)
       puts
       tracker.failure!("Runner failed: #{err.message}")
