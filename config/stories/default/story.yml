@@ -11,7 +11,7 @@ story:
         artifacts_dir: "log/"
 
       virsetup:
-        image_size: 120G
+        image_size: 220G
 
       runners:
         - mkcloud:cleanup:
@@ -35,6 +35,11 @@ story:
             features:
               - admin
               - controller
+        - crowbar:batch:nova:
+            features:
+              - admin
+              - controller
+              - users
         - tempest:run:
             stage: "Tempest run"
             timeout: "20 minutes"
@@ -51,26 +56,18 @@ story:
         - admin_domain:prepare:
             stage: "Admin libvirt domain prepared"
         - qa_crowbarsetup:prepareinstallcrowbar:
-           timeout: "2 minutes"
+            timeout: "2 minutes"
+            stage: "Crowbar installation prepared"
         - qa_crowbarsetup:installcrowbar:
-           timeout: "10 minutes"
-           stage: Crowbar installed
-           features:
-             - admin
+            stage: "Crowbar installed"
+            features:
+              - admin
         - qa_crowbarsetup:allocate:
-           timeout: "20 minutes"
-           stage: Nodes allocated
-        - crowbar:batch:proposal:
-           - barclamp: database
-           - barclamp: nova
-             timeout: "30 minutes"
-             features:
-               - admin
-               - controller
-               - users
-               - images
-           - barclamp: tempest
-             timeout: "20 minutes"
+            stage: "Nodes allocated"
+        - qa_crowbarsetup:waitcompute:
+            stage: "Nodes ready for barclamp deployment"
+        - qa_crowbarsetup:proposal:
+            stage: "Proposals installed"
 
     qa3:
       <<: *qa2

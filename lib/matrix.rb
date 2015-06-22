@@ -77,7 +77,7 @@ module Matrix
     private
 
     def set_hostname
-      hostname = `hostname -f`
+      hostname = `hostname -f 2>&1`.strip
       return hostname if $?.exitstatus.zero?
 
       "localhost"
