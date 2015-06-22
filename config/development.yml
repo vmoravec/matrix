@@ -2,3 +2,16 @@ targets:
   virtual:
     admin_node:
       ip: 192.168.124.10
+
+story:
+  default:
+    virtual:
+      mkcloud:
+        nodenumber: 5
+      virsetup:
+        image_size: 220G
+      runners:
+        - tempest:run:
+            timeout: 20 minutes
+
+

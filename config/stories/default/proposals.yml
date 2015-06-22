@@ -1,0 +1,11 @@
+story:
+  default:
+    virtual:
+      proposals:
+        - barclamp: nova
+          deployment:
+            elements:
+              nova-multi-compute-kvm:
+                - d52-54-02-77-77-02.virtual.cloud.suse.de
+              nova-multi-controller:
+                - d52-54-01-77-77-01.virtual.cloud.suse.de

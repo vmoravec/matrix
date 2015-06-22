@@ -11,7 +11,7 @@ story:
         artifacts_dir: "log/"
 
       virsetup:
-        image_size: 220G
+        image_size: 120G
 
       runners:
         - mkcloud:cleanup:
@@ -64,10 +64,20 @@ story:
               - admin
         - qa_crowbarsetup:allocate:
             stage: "Nodes allocated"
+            features:
+              - admin
         - qa_crowbarsetup:waitcompute:
             stage: "Nodes ready for barclamp deployment"
+            features:
+              - admin
         - qa_crowbarsetup:proposal:
+            timeoute: "30 minutes"
             stage: "Proposals installed"
+            features:
+              - admin
+              - controller
+              - users
+              - images
 
     qa3:
       <<: *qa2
