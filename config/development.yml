@@ -2,8 +2,3 @@ targets:
   virtual:
     admin_node:
       ip: 192.168.124.10
-
-runners:
-  stop_after: admin_domain:prepare
-  virsetup:
-    keep_image: true

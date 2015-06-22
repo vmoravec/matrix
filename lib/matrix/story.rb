@@ -7,7 +7,7 @@ module Matrix
 
     def initialize name: nil, current_target: nil, config: nil
       @name = name || ENV["story"]
-      abort "Missing story name, don't know where to start" unless self.name
+      abort "Missing story name, try with story=STORY_NAME" unless self.name
 
       @tracker = Tracker.new(:story, name)
       @config = config || Matrix.config["story"][self.name]
@@ -23,7 +23,10 @@ module Matrix
 
       @current_target = current_target || find_target(ENV["target"])
       if @current_target.nil?
-        self.target_error = Proc.new { abort "Target not found for story '#{self.name}'" }
+        self.target_error = Proc.new do
+          abort "Target missing for story '#{self.name}'. " +
+                "Try with target=TARGET"
+        end
       end
 
       @runner_options = {}
@@ -38,11 +41,10 @@ module Matrix
     def find_target target_name
       targets_available = "Targets available: \n#{Matrix.targets.only(targets.map(&:name))}"
       if target_name.nil? || target_name.to_s.empty?
-        missing_target = "No target provided for story '#{name}'. "
+        missing_target = "No target provided for story '#{name}', try with target=TARGET"
         self.target_error = Proc.new { abort missing_target + targets_available }
         return
       end
-
       target = targets.find {|t| t.name == target_name }
       if target.nil?
         not_found = "Target '#{target_name}' not found for story '#{name}'. "
