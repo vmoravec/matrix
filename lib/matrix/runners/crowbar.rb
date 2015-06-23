@@ -34,7 +34,7 @@ module Matrix
 
     def use_tempfile content
       file = exec!("mktemp").output
-      exec!("echo \"#{content.to_yaml}\" > #{file}")
+      exec!("cat > #{file}<<EOF\n \"#{content.to_yaml}\"\nEOF")
       yield file
     end
 
@@ -47,6 +47,8 @@ module Matrix
     end
 
     def find_proposal proposal
+      return unless proposals
+
       proposals.find {|p| p["barclamp"] == proposal.to_s }
     end
   end

@@ -125,8 +125,8 @@ runners it might have.
 
      rake stories
 
-  Not all targets are supported by every story. To get the targets supported for a single
-  story, you need to review its targets:
+  Not all targets are supported by every story. To find out if a particular target is
+  supported for a particular story, you need to review its targets:
 
      rake story:default:targets  # returns all targets for story named 'default'
 
@@ -140,6 +140,12 @@ runners it might have.
   This is how to run story named 'default' targeting local virtualized environment:
 
      rake story:default target=virtual
+
+## Todo
+
+  * Once there are jenkins builds for the stories available, implement querying the
+    Jenkins API for the historical build data. This might be useful for fast checking
+    of regressions.
 
 
 
