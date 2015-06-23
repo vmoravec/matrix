@@ -26,7 +26,7 @@ module Matrix
 
     def run_story
       log.info("Launching story '#{story.name}:#{story.desc}' for target '#{story.current_target.name}'")
-      runner_tasks = story.runners.map do |runner_details|
+      runner_tasks = group_runners.map do |runner_details|
         story.runner_options = runner_details
         RunnerTask.new(story)
       end
@@ -43,6 +43,28 @@ module Matrix
       raise
     ensure
       story.tracker.dump!
+    end
+
+    def group_runners
+      @grouped = []
+      runner_names = story.runners.map(&:keys).flatten
+      grouped = runner_names.group_by {|name| name}
+      story.runners.map do |runner_details|
+        name = runner_details.keys.first
+        if grouped[name].size > 1
+          if @grouped.include?(name)
+            next
+          else
+            selected = story.runners.select {|r| r.keys.first == name }
+            base_details = selected.shift
+            selected.each {|runner| base_details.deep_merge!(runner)}
+            @grouped << name
+            base_details
+          end
+        else
+          runner_details
+        end
+      end.compact
     end
 
     def define_tasks
