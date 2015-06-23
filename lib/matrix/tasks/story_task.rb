@@ -72,6 +72,13 @@ module Matrix
           task :targets do
             puts Matrix.targets.only(story.targets.map(&:name))
           end
+
+          # Not showing task desc on purpose
+          task :features do
+            story.finalize!
+            require "awesome_print"
+            ap story.runners.map {|r| r.values.map {|attr| attr["features"]} }.flatten.compact.uniq
+          end
         end
 
         # Define the main task to run a story

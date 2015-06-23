@@ -35,7 +35,7 @@ module Matrix
     alias_method :target, :current_target
 
     def runners
-      group_runners
+      group_runners || []
     end
 
     def find_target target_name
