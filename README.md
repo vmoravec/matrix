@@ -1,8 +1,8 @@
 # Matrix
 
-This is a tool for cloud environments' deployment and testing.
+This is a tool for cloud deployment and testing.
 
-It navigates the user with in main categories:
+Note on the terms used here:
 
 * stories - they represent various deployment scenarios combined with feature tests
 * runners - they represent commands being executed to drive the stories to happyend
@@ -13,15 +13,17 @@ runners it might have.
 
 ## Quick start
 
-  1.  Check [system dependencies](#dependencies)
-  2.  `git clone git@github.com:vmoravec/matrix`
-  3.  `alias rake="bundle exec rake"` # more on this further below
-  4.  `cd matrix && rake install`
-  5.  `rake h`
-  6. [Run a story!](#how-to-run-a-story)
+  1.  Check [system dependencies](#dependencies)  
+  2.  `git clone git@github.com:vmoravec/matrix`  
+  3.  `alias rake="bundle exec rake"` # more on this further below  
+  4.  `cd matrix && rake install`  
+  5.  `rake h`  
+  6. [Run a story!](#how-to-run-a-story)  
+
 
   You can run all `rake` tasks as a `root` or a regular user after you have
   enhanced your sudoers file to not require password for `sudo`:
+
      $USER ALL=(ALL) NOPASSWD:ALL
 
 
