@@ -20,6 +20,10 @@ runners it might have.
   5.  `rake h`
   6. [Run a story!](#how-to-run-a-story)
 
+  You can run all `rake` tasks as a `root` or a regular user after you have
+  enhanced your sudoers file to not require password for `sudo`:
+     $USER ALL=(ALL) NOPASSWD:ALL
+
 
 ## Dependencies
 
