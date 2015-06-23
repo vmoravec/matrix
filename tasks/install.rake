@@ -1,13 +1,18 @@
-namespace :git do
-  # This is not git related but it updates the cct gem from git repo
-  namespace :cct do
-    desc "Update the gem from cct repository"
-    task :pull do
-      system "bundle update"
-    end
-  end
+desc "Install dependencies"
+task :install do
+  sh "bundle install"
+  invoke_task("install:automation:clone")
+end
 
-  namespace :auto do
+desc "Update dependencies"
+task :update do
+  sh "bundle update"
+  invoke_task("install:automation:pull")
+end
+
+
+namespace :install do
+  namespace :automation do
     def automation_repo
       @path ||= matrix.config["vendor_dir"] + "/automation"
     end
@@ -16,13 +21,13 @@ namespace :git do
       ENV['branch'] || matrix.config['git']['automation']['branch'] || 'master'
     end
 
-    desc "Remove the old repo and clone it again"
+    # Remove the old repo and clone it again
     task :reload do
       rm_rf(automation_repo)
-      invoke_task("git:automation:clone")
+      invoke_task("install:automation:clone")
     end
 
-    desc "Fetch the remote"
+    # Fetch the remote
     task :fetch do
       puts "Fetching from url '#{matrix.config['git']['automation']['url']}'"
       chdir(automation_repo) do
@@ -30,7 +35,7 @@ namespace :git do
       end
     end
 
-    desc "Create a clone of automation repository"
+    # Create a clone of automation repository
     task :clone do
       puts "Cloning from url '#{matrix.config['git']['automation']['url']}'"
       chdir(matrix.config['vendor_dir']) do
@@ -38,21 +43,21 @@ namespace :git do
       end
     end
 
-    desc "Update the automation code from upstream repo"
+    # Update the automation code from upstream repo
     task :pull do
       chdir(automation_repo) do
         system "git pull origin #{checkout_target}"
       end
     end
 
-    desc "Checkout the prefered branch"
+    # Checkout the prefered branch
     task :checkout do
       chdir(automation_repo) do
         system "git checkout #{checkout_target}"
       end
     end
 
-    desc "Show git log"
+    # Show git log
     task :log do
       chdir(automation_repo) do
         system "git log"

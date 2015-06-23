@@ -35,7 +35,7 @@ module Matrix
     alias_method :target, :current_target
 
     def runners
-      config["runners"] || []
+      group_runners
     end
 
     def find_target target_name
@@ -69,5 +69,35 @@ module Matrix
     end
 
     alias_method :begin, :finalize!
+
+    private
+
+
+    # Configuration merging on a list of runners
+    # This resolves missing deep merge strategy for arrays as hash values which
+    # is case of runners
+    def group_runners
+      @grouped = []
+      runners = config["runners"]
+      runner_names = runners.map(&:keys).flatten
+      grouped = runner_names.group_by {|name| name}
+      runners.map do |runner_details|
+        name = runner_details.keys.first
+        if grouped[name].size > 1
+          if @grouped.include?(name)
+            next
+          else
+            selected = runners.select {|r| r.keys.first == name }
+            base_details = selected.shift
+            selected.each {|runner| base_details.deep_merge!(runner)}
+            @grouped << name
+            base_details
+          end
+        else
+          runner_details
+        end
+      end.compact
+    end
+
   end
 end
