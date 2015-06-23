@@ -18,6 +18,7 @@ runners it might have.
   3.  `alias rake="bundle exec rake"` # more on this further below
   4.  `cd matrix && rake install`
   5.  `rake h`
+  6. [Run a story!](#how-to-run-a-story)
 
 
 ## Dependencies
@@ -61,29 +62,26 @@ runners it might have.
 
   the rubygems installed in path `vendor/bundle` are not visible to `rake`.
 
+
 ## Useful commands
 
   Get some help:
 
      rake help
      rake h
-     rake -T
-     rake -T keyword
+     rake -T keyword # will match all tasks by provided keyword
 
-  More specific help:
+  More specific information:
+
+     rake targets
+     rake features
+     rake stories
+
+  Get config dumps:
 
      rake config
      rake config:main
      rake config:targets
-     rake features
-     rake stories
-
-  Story specific help:
-
-     rake story:default:targets
-     rake story:default:runners
-     rake story:default:config
-     rake story:default:features
 
   Run a story:
 
@@ -95,20 +93,53 @@ runners it might have.
 
      rake spec
 
+
 ## What is a story?
 
   A story is maintained scenario with yaml file configuration and deployment path
   with tests executed at some specific checkpoints.
 
+
 ## What is a runner?
 
   Runners are commands that drive the installation.
-  They are available as `rake` tasks and can be run separately outside of a story run.
+  They are available as `rake` tasks and can be run separately outside of a story.
+
 
 ## What is a feature?
 
   Features are part of the [Cucumber Cloud Testsuite](https://github.com/suse-cloud/cct/).
   A feature is a collection of test cases being run at some point of installation workflow.
+
+
+## How to run a story?
+
+  Before running a story you need to pick a target for your cloud deployment.
+  You either choose the `libvirt` driven target called `virtual` or a particular
+  hardware you have permission to install on.
+  The list of available hardware targets is available by
+
+     rake targets
+
+  This returns the list of all stories.
+
+     rake stories
+
+  Not all targets are supported by every story. To get the targets supported for a single
+  story, you need to review its targets:
+
+     rake story:default:targets  # returns all targets for story named 'default'
+
+  You can get additional information on a single story, however you need to specify
+  the target you point at:
+
+     rake story:default:runners target=TARGET
+     rake story:default:config target=TARGET
+     rake story:default:features target=TARGET
+
+  This is how to run story named 'default' targeting local virtualized environment:
+
+     rake story:default target=virtual
 
 
 
