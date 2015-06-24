@@ -22,9 +22,10 @@ runners it might have.
 
 
   You can run all `rake` tasks as a `root` or a regular user after you have
-  enhanced your sudoers file to not require password for `sudo`:
+  enhanced your sudoers file to not require password for `sudo` (you should
+  know the consequences of that):
 
-     $USER ALL=(ALL) NOPASSWD:ALL
+     $user ALL=(ALL) NOPASSWD:ALL  # use that at your own risk!
 
 
 ## Dependencies
@@ -47,6 +48,36 @@ runners it might have.
 
   All rubygems will be installed into the directory `vendor/bundle` within the repo.
   Other dependencies are put into the `vendor/` directory.
+
+
+## Configuration
+
+  Yaml configuration files are the crucial for correct functionality.
+  They are located in the `config/` dir and are split into several files:
+
+  * targets.yml  
+    Configuration of the hardware
+
+  * main.yml  
+    General configuration data
+
+  * development.yml  
+    Custom reconfiguration if required for custom deployment. This file does not
+    exists by default, you can create one by copying of the provided example file.
+
+  * story configuration files  
+
+    These are located in the story specific directories.
+    There are at least 3 types of them:  
+
+      - story.yml  
+        Main file with runners and runner configs  
+
+      - proposals.yml  
+        Crowbar proposal configuration
+
+      - features.yml  
+        Configuration for cucumber scenarios loaded from [cloud testsuite](https://github.com/suse-cloud/cct)
 
 
 ## Usage
