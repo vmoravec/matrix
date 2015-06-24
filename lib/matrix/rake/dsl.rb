@@ -36,8 +36,8 @@ module Rake
       @config_runner ||= Matrix::ConfigRunner.new
     end
 
-    def admin_domain
-      @admin_domain ||= Matrix::AdminDomainRunner.new
+    def admin_vm
+      @admin_vm ||= Matrix::AdminVmRunner.new
     end
 
     def tempest

@@ -16,13 +16,23 @@ module Matrix
     end
 
     def prepare_admin
-      libvirt_domain = story.target.gate.admin_domain.name
-      snapshot_source = "/var/lib/libvirt/images/#{libvirt_domain}.raw.snapshot-base_install"
-      snapshot_destination = "/var/lib/libvirt/images/#{libvirt_domain}.raw"
-      domain_exists = exec!("virsh list | grep #{libvirt_domain}") rescue nil
-      exec! "virsh destroy #{libvirt_domain}" if domain_exists
-      exec! "cp #{snapshot_source} #{snapshot_destination}"
-      exec! "virsh start #{libvirt_domain}"
+      case story.target.name
+      when "qa2", "qa3"
+        libvirt_domain = story.target.gate.admin_vm.name
+        snapshot_source = "/var/lib/libvirt/images/#{libvirt_domain}.raw.snapshot-base_install"
+        snapshot_destination = "/var/lib/libvirt/images/#{libvirt_domain}.raw"
+        domain_exists = exec!("virsh list | grep #{libvirt_domain}") rescue nil
+        exec! "virsh destroy #{libvirt_domain}" if domain_exists
+        exec! "cp #{snapshot_source} #{snapshot_destination}"
+        exec! "virsh start #{libvirt_domain}"
+      when "qa1"
+        vm_name = story.target.gate.admin_vm.name
+        exec! "virsh destroy #{vm_name}"
+        exec! "virsh snapshot-revert #{vm_name} base_install2 --running"
+        exec! "virsh start #{vm_name}"
+      else
+        abort "Don't know how to prepare admin for target '#{story.target.name}'"
+      end
     end
 
   end

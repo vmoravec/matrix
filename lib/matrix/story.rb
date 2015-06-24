@@ -74,15 +74,17 @@ module Matrix
 
 
     # Configuration merging on a list of runners
-    # This resolves missing deep merge strategy for arrays as hash values which
-    # is case of runners
+    # This resolves missing deep merge strategy for arrays with hash values which
+    # is a case for list of runners in story configuration
     def group_runners
       @grouped = []
       runners = config["runners"]
-      runner_names = runners.map(&:keys).flatten
+      runner_names = remove_unwanted(runners.map(&:keys).flatten)
       grouped = runner_names.group_by {|name| name}
       runners.map do |runner_details|
         name = runner_details.keys.first
+        next unless runner_names.include?(name)
+
         if grouped[name].size > 1
           if @grouped.include?(name)
             next
@@ -97,6 +99,35 @@ module Matrix
           runner_details
         end
       end.compact
+    end
+
+    # Ignore the runners that comes after the runner specified by "stop_after" condition
+    def remove_unwanted runners
+      if ENV["stop_after"]
+        stop_after(runners)
+      elsif ENV["continue_with"]
+        continue_with(runners)
+      else
+        return runners
+      end
+    end
+
+    def stop_after runners
+      stop_runner = ENV["stop_after"]
+      if !runners.find {|r| r == stop_runner}
+        abort "Runner '#{stop_runner}' not found"
+      end
+
+      runners.take(runners.index(stop_runner) + 1)
+    end
+
+    def continue_with runners
+      continue_runner = ENV["continue_with"]
+      if !runners.find {|r| r == continue_runner}
+        abort "Runner '#{continue_runner} not found"
+      end
+
+      runners.drop_while {|r| r != continue_runner }
     end
 
   end

@@ -10,8 +10,8 @@ module Matrix
 
         @command =
           RemoteCommand.new(
-            ip: gate.admin_domain.name,
-            user: gate.admin_domain.user,
+            ip: gate.admin_vm.name,
+            user: gate.admin_vm.user,
             proxy: {
               "user" => gate.user,
               "fqdn" => gate.fqdn

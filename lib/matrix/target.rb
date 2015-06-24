@@ -49,17 +49,18 @@ module Matrix
     end
 
     class Gate
-      attr_reader :ip, :fqdn, :user, :admin_domain, :command
+      attr_reader :ip, :fqdn, :user, :admin_vm, :command
 
       def initialize params
-        @ip = params["ip"]
+        @ip = params["ip"] || Resolv.getaddress(params["fqdn"])
         @fqdn = params["fqdn"]
         @user = params["user"]
-        return unless params["admin_domain"]
+        return unless params["admin_vm"]
 
-        @admin_domain = OpenStruct.new(
-          name: params["admin_domain"]["name"],
-          user: params["admin_domain"]["user"],
+        @admin_vm = OpenStruct.new(
+          name:   params["admin_vm"]["name"],
+          user:   params["admin_vm"]["user"],
+          domain: params["admin_vm"]["domain"] || params["admin_vm"]["name"]
         )
       end
 
@@ -75,7 +76,7 @@ Description: #{desc}
 Gate:
   Fqdn:  #{gate.fqdn}
   User:  #{gate.user}
-  Admin domain:  #{gate.admin_domain.name if gate.admin_domain}
+  Admin vm:  #{gate.admin_vm.name if gate.admin_vm}
 Admin node:
   Ip:  #{admin_node.ip}
   Fqdn:  #{admin_node.fqdn}

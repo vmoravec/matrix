@@ -53,7 +53,7 @@ story:
       runners:
         - gate:prepare_admin:
             stage: "Image for admin node prepared"
-        - admin_domain:prepare:
+        - admin_vm:prepare:
             stage: "Admin libvirt domain prepared"
         - qa_crowbarsetup:prepareinstallcrowbar:
             timeout: "2 minutes"
@@ -85,3 +85,10 @@ story:
         <<: *default_mkcloud
         cloud: qa3
 
+    qa1:
+      <<: *qa2
+      mkcloud:
+        <<: *default_mkcloud
+        cloud: qa1
+        qa1password: qatesting
+        adminip: 10.162.26.140

@@ -19,12 +19,29 @@ targets:
         port: 22
 
   # SSH key based authentication
+  qa1:
+    desc: "Cloud 1 (location unknown)"
+    gate:
+      fqdn: gate.cloudadm.qa.suse.de
+      user: root
+      admin_vm:
+        domain: crowbar
+        name: crowbar2
+        user: root
+    admin_node:
+      <<: *admin_node
+      ip: 10.162.26.140
+      fqdn: crowbar.cloud2adm.qa.suse.de
+    control_node:
+      <<: *control_node
+
+  # SSH key based authentication
   qa2:
     desc: "Cloud 2 in rack 19 in server room 2 in Nürnberg"
     gate:
       fqdn: gate.cloud2adm.qa.suse.de
       user: root
-      admin_domain:
+      admin_vm:
         name: crowbar2
         user: root
     admin_node:
@@ -40,7 +57,7 @@ targets:
     gate:
       fqdn: gate.cloud3adm.qa.suse.de
       user: root
-      admin_domain:
+      admin_vm:
         name: crowbar3
         user: root
     admin_node:
