@@ -1,7 +1,6 @@
 module Matrix
   class CrowbarRunner < Runner
     attr_reader :proposals
-    PROPOSAL_ROOT = { "proposals" => [] }
 
     def initialize
       super do
@@ -22,11 +21,11 @@ module Matrix
       detect_proposals(props)
       props.each do |proposal|
         prop = find_proposal(proposal)
-        deploy_proposal = PROPOSAL_ROOT.dup
+        deploy_proposal = { "proposals" => [] }
         deploy_proposal["proposals"] << prop
-        use_tempfile(deploy_proposal) do |file|
-          exec!("crowbar batch build #{file}")
-        end
+        file = exec!("mktemp").output
+        exec!("cat > #{file}<<EOF\n \"#{deploy_proposal.to_yaml}\"\nEOF")
+        exec!("crowbar batch build #{file}")
       end
     end
 
