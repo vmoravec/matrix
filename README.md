@@ -55,28 +55,27 @@ runners it might have.
   Yaml configuration files are the crucial for correct functionality.
   They are located in the `config/` dir and are split into several files:
 
-  * targets.yml  
+  * `targets.yml`  
     Configuration of the hardware
 
-  * main.yml  
+  * `main.yml`  
     General configuration data
 
-  * development.yml  
+  * `development.yml`  
     Custom reconfiguration if required for custom deployment. This file does not
     exists by default, you can create one by copying of the provided example file.
 
   * story configuration files  
-
     These are located in the story specific directories.
     There are at least 3 types of them:  
 
-      - story.yml  
+      - `story.yml`  
         Main file with runners and runner configs  
 
-      - proposals.yml  
+      - `proposals.yml`  
         Crowbar proposal configuration
 
-      - features.yml  
+      - `features.yml`  
         Configuration for cucumber scenarios loaded from [cloud testsuite](https://github.com/suse-cloud/cct)
 
 
