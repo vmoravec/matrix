@@ -14,4 +14,9 @@ namespace :qa_crowbarsetup do
     qa_crowbarsetup.exec! "allocate"
   end
 
+  desc "Register nodes with crowbar_register"
+  task :crowbar_register do
+    qa_crowbarsetup.exec! "crowbar_register"
+  end
+
 end

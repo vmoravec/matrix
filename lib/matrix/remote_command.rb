@@ -8,7 +8,8 @@ module Matrix
 
     Result = Struct.new(:success?, :output, :exit_code, :host)
 
-    attr_reader :session, :options, :log, :gateway, :proxy, :capture, :recorder
+    attr_reader :session, :options, :log, :gateway, :proxy, :capture,
+                :recorder, :result
     attr_accessor :target
 
     def initialize opts
@@ -31,7 +32,7 @@ module Matrix
       environment = set_environment(params)
       full_command = "#{command} #{params.join(" ")}".strip
 
-      result = Result.new(false, "", 1000, host_ip)
+      @result = Result.new(false, "", 1000, host_ip)
       open_session_channel do |channel|
         channel.exec("#{environment}#{full_command}") do |p, d|
           log.always("Running command `#{full_command}` on remote host #{host_ip}")

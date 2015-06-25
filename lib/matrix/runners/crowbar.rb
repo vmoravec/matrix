@@ -23,8 +23,8 @@ module Matrix
         prop = find_proposal(proposal)
         deploy_proposal = { "proposals" => [] }
         deploy_proposal["proposals"] << prop
-        file = exec!("mktemp").output
-        exec!("cat > #{file}<<EOF\n \"#{deploy_proposal.to_yaml}\"\nEOF")
+        file = exec!("mktemp").output.strip
+        exec!("cat > #{file}<<EOF\n#{deploy_proposal.to_yaml}\nEOF")
         exec!("crowbar batch build #{file}")
       end
     end
