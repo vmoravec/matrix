@@ -50,10 +50,10 @@ module Matrix
       command.exec!(action)
     rescue => err
       raise if story.task
-      puts command.result.output
+      puts command.result.output if command.result
       puts err.message
       log.error(err.message)
-      log.error(command.result.output)
+      log.error(command.result.output) if command.result
     end
   end
 end

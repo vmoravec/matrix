@@ -9,41 +9,28 @@ module Matrix
       @proposals = story.config["proposals"]
     end
 
-    def batch build: [], export: []
-      props =
-        case build
-        when Symbol then [ build ]
-        when Array  then build
-        else raise "Symbol or array allowed for proposal builds"
-        end
+    def batch build: nil, export: nil
+      build_proposal(build)
+      export_proposal(export)
+    end
 
-      abort "No proposals found" if props.empty?
-      detect_proposals(props)
-      props.each do |proposal|
-        prop = find_proposal(proposal)
-        deploy_proposal = { "proposals" => [] }
-        deploy_proposal["proposals"] << prop
-        file = exec!("mktemp").output.strip
-        exec!("cat > #{file}<<EOF\n#{deploy_proposal.to_yaml}\nEOF")
-        exec!("crowbar batch build #{file}")
-      end
+    def build_proposal name
+      return if name.nil?
+      proposal = find_proposal(name)
+      return unless proposal
+
+      deploy_proposal = { "proposals" => [] }
+      deploy_proposal["proposals"] << proposal
+      file = exec!("mktemp").output.strip
+      exec!("cat > #{file}<<EOF\n#{deploy_proposal.to_yaml}\nEOF")
+      exec!("crowbar batch build #{file}")
+    end
+
+    def export_proposal name
+      return if name.nil?
     end
 
     private
-
-    def use_tempfile content
-      file = exec!("mktemp").output
-      exec!("cat > #{file}<<EOF\n \"#{content.to_yaml}\"\nEOF")
-      yield file
-    end
-
-    def detect_proposals props
-      props.each do |proposal|
-        if !find_proposal(proposal)
-          abort "Proposal #{proposal} not found"
-        end
-      end
-    end
 
     def find_proposal proposal
       return unless proposals
