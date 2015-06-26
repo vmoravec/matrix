@@ -1,5 +1,3 @@
-# look at https://github.com/bmwiedemann/automation/commit/9dbabebfd779fab76e66c9c835ab28f3ebc141a9
-# to fix the single proposal building and not all at once
 ---
 story:
   default:
@@ -52,12 +50,18 @@ story:
         - qa_crowbarsetup:installcrowbar:
             features:
               - admin
+        # do not use that, create own implementation for
+        # node allocation that will pick the configuration 
+        # from nodes.yml
         - qa_crowbarsetup:allocate:
             features:
               - admin
         - qa_crowbarsetup:waitcompute:
             features:
               - admin
+        # look at https://github.com/bmwiedemann/automation/commit/9dbabebfd779fab76e66c9c835ab28f3ebc141a9
+        # to fix the single proposal building and not all at once
+        # Use that patch to test proposal building one by one, not all at once
         - tempest:run:
             timeout: "30 minutes"
             features:
