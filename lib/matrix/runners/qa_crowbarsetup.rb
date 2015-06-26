@@ -21,13 +21,13 @@ module Matrix
       end
     end
 
-    def exec! action
+    def exec! action, admin_runlist: true
       @environment = config["mkcloud"].inject("") do |env, config_pair|
         key, value = config_pair
-        env << "export #{key}=#{value}; "
+        value.to_s.empty? ? env : env << "#{key}=#{value} "
       end
       bin = "/root/#{COMMAND}"
-      prepare = "source #{bin}; onadmin_runlist "
+      prepare = "source #{bin}; #{'onadmin_runlist' if admin_runlist} "
       super(prepare << action.to_s)
     end
   end

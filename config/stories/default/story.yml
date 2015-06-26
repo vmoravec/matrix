@@ -1,3 +1,5 @@
+# look at https://github.com/bmwiedemann/automation/commit/9dbabebfd779fab76e66c9c835ab28f3ebc141a9
+# to fix the single proposal building and not all at once
 ---
 story:
   default:
@@ -15,22 +17,15 @@ story:
 
       runners:
         - mkcloud:cleanup:
-            stage: "Ancient cloud build wiped out"
         - virsetup:configure:
-            stage: "Setup for virtual deployment ready"
         - mkcloud:prepare:
-            stage: "Environment prepared for mkcloud"
         - mkcloud:setupadmin:
-            stage: "Admin node prepared for crowbar installation"
         - mkcloud:installcrowbar:
-            stage: "Admin node installed"
             timeout: "20 minutes"
             features:
               - admin
         - mkcloud:installnodes:
-            stage: "Nodes installed"
         - mkcloud:installproposal:
-            stage: "Controller node and compute node installed"
             timeout: "25 minutes"
             features:
               - admin
@@ -41,7 +36,6 @@ story:
               - controller
               - users
         - tempest:run:
-            stage: "Tempest run"
             timeout: "20 minutes"
 
 
@@ -52,27 +46,20 @@ story:
 
       runners:
         - gate:prepare_admin:
-            stage: "Image for admin node prepared"
         - admin_vm:prepare:
-            stage: "Admin libvirt domain prepared"
         - qa_crowbarsetup:prepareinstallcrowbar:
             timeout: "2 minutes"
-            stage: "Crowbar installation prepared"
         - qa_crowbarsetup:installcrowbar:
-            stage: "Crowbar installed"
             features:
               - admin
         - qa_crowbarsetup:allocate:
-            stage: "Nodes allocated"
             features:
               - admin
         - qa_crowbarsetup:waitcompute:
-            stage: "Nodes ready for barclamp deployment"
             features:
               - admin
-        - qa_crowbarsetup:proposal:
-            timeoute: "30 minutes"
-            stage: "Proposals installed"
+        - tempest:run:
+            timeout: "30 minutes"
             features:
               - admin
               - controller

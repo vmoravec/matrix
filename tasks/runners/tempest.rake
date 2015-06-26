@@ -1,5 +1,5 @@
 namespace :tempest do
-  desc "Set up and run tempest tests"
+  desc "Tempest tests run"
   task :run do
     tempest.run
   end

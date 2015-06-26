@@ -1,5 +1,5 @@
 namespace :virsetup do
-  desc "Configure virsetup"
+  desc "Setup for virtual deployment ready"
   task :configure do
     virsetup.configure
   end

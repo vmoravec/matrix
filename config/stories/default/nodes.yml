@@ -1,0 +1,5 @@
+nodes:
+  qa2:
+    d00-25-90-e5-05-12:
+      platform: suse-12.0
+      role: compute

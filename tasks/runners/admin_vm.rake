@@ -1,5 +1,5 @@
 namespace :admin_vm do
-  desc "Prepare admin domain for crowbar setup"
+  desc "Admin libvirt domain prepared"
   task :prepare do
     admin_vm.prepare
   end

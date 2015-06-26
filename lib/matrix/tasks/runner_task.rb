@@ -44,14 +44,16 @@ module Matrix
     end
 
     def invoke_runner tracker, params
+      rake_task = Rake::Task[runner_name]
+      tracker.stage = rake_task.comment
+      tracker.timeout = params["timeout"] || DEFAULT_TIMEOUT
       story.tracker.runners << tracker unless params.is_a?(Array)
-      update_tracker(tracker, params)
-      event = params["stage"] || "(no target description was given)"
+      event = rake_task.comment
       time = params["timeout"] || DEFAULT_TIMEOUT
       puts ">> Invoking `#{runner_name}` with timeout #{time} to make '#{event}'"
       wait_for(event, max: time) do
-        Rake::Task[runner_name].invoke
-        Rake::Task[runner_name].reenable
+        rake_task.invoke
+        rake_task.reenable
       end
       puts
     rescue => err
@@ -104,11 +106,6 @@ module Matrix
 
     def ignore_features?
       ignore_features
-    end
-
-    def update_tracker tracker, params
-      tracker.stage = params["stage"]
-      tracker.timeout = params["timeout"] || DEFAULT_TIMEOUT
     end
 
     def log_error err

@@ -1,30 +1,30 @@
 namespace :mkcloud do
-  desc "Cleanup leftovers from last run"
+  desc "Ancient cloud build wiped out"
   task :cleanup do
     mkcloud.cleanup
   end
 
-  desc "Prepare the environment for cloud installation"
+  desc "Environment prepared for mkcloud"
   task :prepare do
     mkcloud.exec! :prepare
   end
 
-  desc "Setup admin node"
+  desc "Admin node prepared for crowbar installation"
   task :setupadmin do
     mkcloud.exec! :setupadmin
   end
 
-  desc "Install crowbar"
+  desc "Admin node installed"
   task :installcrowbar do
     mkcloud.exec! "addupdaterepo runupdate prepareinstcrowbar instcrowbar"
   end
 
-  desc "Set up & install controller and compute nodes"
+  desc "Nodes installed"
   task :installnodes do
     mkcloud.exec! "setupnodes instnodes"
   end
 
-  desc "Install default proposal"
+  desc "Controller node and compute node installed"
   task :installproposal do
     mkcloud.exec! "proposal"
   end

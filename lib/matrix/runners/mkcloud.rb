@@ -26,7 +26,7 @@ module Matrix
     def exec! action
       environment = config["mkcloud"].inject("") do |env, config_pair|
         key, value = config_pair
-       value.to_s.empty? ? env : env << "#{key}=#{value} "
+        value.to_s.empty? ? env : env << "#{key}=#{value} "
       end
       @environment = environment
       super(action)
