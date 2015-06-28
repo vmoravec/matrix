@@ -1,11 +1,18 @@
 targets:
-  # Libvirt, lvm and friends
-  virtual:
-    desc: "Virtualized environment with libvirt"
+  # SSH key based authentication
+  qa1:
+    desc: "Cloud 1 (location unknown)"
     gate:
-      fqdn: localhost
+      fqdn: gate.cloudadm.qa.suse.de
+      user: root
+      admin_vm:
+        domain: crowbar
+        name: crowbar2
+        user: root
     admin_node: &admin_node
-      ip: CAN'T BE BLANK
+    admin_node:
+      ip: 10.162.26.140
+      fqdn: crowbar.cloud2adm.qa.suse.de
       ssh:
         user: root
         password: linux
@@ -17,23 +24,6 @@ targets:
         user: root
         password: linux
         port: 22
-
-  # SSH key based authentication
-  qa1:
-    desc: "Cloud 1 (location unknown)"
-    gate:
-      fqdn: gate.cloudadm.qa.suse.de
-      user: root
-      admin_vm:
-        domain: crowbar
-        name: crowbar2
-        user: root
-    admin_node:
-      <<: *admin_node
-      ip: 10.162.26.140
-      fqdn: crowbar.cloud2adm.qa.suse.de
-    control_node:
-      <<: *control_node
 
   # SSH key based authentication
   qa2:
@@ -66,3 +56,14 @@ targets:
       fqdn: crowbar.cloud3adm.qa.suse.de
     control_node:
       <<: *control_node
+  # Libvirt, lvm and friends
+  virtual:
+    desc: "Virtualized environment with libvirt"
+    gate:
+      fqdn: localhost
+    admin_node:
+      <<: *admin_node
+      ip: CAN'T BE BLANK
+    control_node:
+      <<: *control_node
+

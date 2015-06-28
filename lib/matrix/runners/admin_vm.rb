@@ -25,8 +25,10 @@ module Matrix
       end
 
       exec! "rm -f qa_crowbarsetup.sh"
+      repo_config = Matrix.config["git"]["automation"]
+      repo_url = repo_config["url"].gsub!(":", "/")
       exec! "wget --no-check-certificate " +
-      "https://raw.github.com/SUSE-Cloud/automation/master/scripts/qa_crowbarsetup.sh"
+            "https://raw.#{repo_url}/#{repo_config["branch"]}/scripts/qa_crowbarsetup.sh"
     end
   end
 end

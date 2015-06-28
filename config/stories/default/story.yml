@@ -43,32 +43,34 @@ story:
         cloud: qa2
 
       runners:
-        - gate:prepare_admin:
-        - admin_vm:prepare:
-        - qa_crowbarsetup:prepareinstallcrowbar:
-            timeout: "2 minutes"
-        - qa_crowbarsetup:installcrowbar:
-            features:
-              - admin
-        # do not use that, create own implementation for
-        # node allocation that will pick the configuration 
-        # from nodes.yml
-        - qa_crowbarsetup:allocate:
-            features:
-              - admin
-        - qa_crowbarsetup:waitcompute:
-            features:
-              - admin
-        # look at https://github.com/bmwiedemann/automation/commit/9dbabebfd779fab76e66c9c835ab28f3ebc141a9
-        # to fix the single proposal building and not all at once
-        # Use that patch to test proposal building one by one, not all at once
-        - tempest:run:
-            timeout: "30 minutes"
-            features:
-              - admin
-              - controller
-              - users
-              - images
+      - gate:prepare_admin:
+      - admin_vm:prepare:
+      - qa_crowbarsetup:prepareinstallcrowbar:
+          timeout: "2 minutes"
+      - qa_crowbarsetup:installcrowbar:
+          features:
+            - admin
+      - qa_crowbarsetup:ipmi_reboot:
+      - crowbar:wait_all_discovered:
+          features:
+            - nodes
+      - qa_crowbarsetup:configure_nodes:
+      - crowbar:allocate:
+          features:
+            - admin
+      - qa_crowbarsetup:waitcompute:
+          features:
+            - admin
+      # look at https://github.com/bmwiedemann/automation/commit/9dbabebfd779fab76e66c9c835ab28f3ebc141a9
+      # to fix the single proposal building and not all at once
+      # Use that patch to test proposal building one by one, not all at once
+      - tempest:run:
+          timeout: "30 minutes"
+          features:
+            - admin
+            - controller
+            - users
+            - images
 
     qa3:
       <<: *qa2

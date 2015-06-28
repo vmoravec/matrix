@@ -1,4 +1,16 @@
 namespace :crowbar do
+  desc "List machines"
+  task :list_machines do
+    crowbar.list_nodes.each_with_index do |machine, i|
+      puts "#{i + 1}. #{machine}"
+    end
+  end
+
+  desc "All nodes discovered"
+  task :wait_all_discovered do
+    crowbar.wait_all_discovered
+  end
+
   namespace :batch do
     @proposals = %w(
       pacemaker

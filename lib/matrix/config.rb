@@ -29,7 +29,6 @@ module Matrix
       @content = load_default_config
       load_targets_config
       load_story_configs
-      load_proposal_configs
       load_devel_config
       #TODO: Still missing
       load_env_config
@@ -46,6 +45,12 @@ module Matrix
       config_file = dir.join(filename)
       files << config_file
       @content = content.deep_merge!(load_content(config_file))
+    end
+
+    def load_story_details story
+      load_story_proposals(story)
+      load_story_nodes(story)
+      overlay_devel(story)
     end
 
     private
@@ -89,15 +94,88 @@ module Matrix
       return unless File.exist?(config_file)
 
       @devel = load_content(config_file)
-      merge!(config_file)
+      # Do not merge the devel proposals yet as this will be done later
+      content.deep_merge!(devel.reject {|k,_| %w( proposals nodes ).include?(k) })
     end
 
-    def load_proposal_configs
+    def load_story_proposals story
       config_dir = dir.join(STORIES_DIR)
-      config_dir.children.each do |story|
-        config_file = story.join("proposals.yml")
-        next unless File.exist?(config_file)
-        merge!(config_file)
+      config_file = config_dir.join(story.name, "proposals.yml")
+      return unless File.exist?(config_file)
+
+      content = load_content(config_file)
+      return unless content["proposals"]
+      return unless content["proposals"][story.target.name]
+
+      story.config.deep_merge!(
+        "proposals" => content["proposals"][story.target.name]
+      )
+    end
+
+    def load_story_nodes story
+      config_dir = dir.join(STORIES_DIR)
+      config_file = config_dir.join(story.name, "nodes.yml")
+      return unless File.exist?(config_file)
+
+      content = load_content(config_file)
+
+      return unless content["nodes"]
+      return unless content["nodes"][story.target.name]
+
+      story.config.deep_merge!(
+        "nodes" => content["nodes"][story.target.name]
+      )
+    end
+
+    def overlay_devel story
+      return unless devel
+
+      update_story_proposals(story)
+      update_story_nodes(story)
+    end
+
+    def update_story_nodes story
+      devel_nodes = devel["nodes"]
+      return unless devel_nodes
+
+      story_nodes = devel_nodes[story.target.name]
+      story.config.deep_merge!("nodes" => story_nodes) if story_nodes
+    end
+
+    def update_story_proposals story
+      # Proposals in development.yml
+      devel_proposals = devel["proposals"]
+      return unless devel_proposals
+
+      # Proposals in development.yml matching the story target
+      devel_proposals = devel_proposals[story.target.name]
+      return unless devel_proposals
+
+      # Propoasals for the current story loaded from proposals.yml file
+      story_proposals = story.config["proposals"]
+
+      if story_proposals
+        applied = []
+        new_proposals = story_proposals.inject([]) do |all, proposal|
+          name = proposal["barclamp"]
+          devel_barclamp = devel_proposals.find {|p| p["barclamp"] == name }
+          if devel_barclamp
+            applied << name
+            all << devel_barclamp
+          else
+            all << proposal
+          end
+        end
+
+        devel_proposals.each do |proposal|
+          next if applied.include?(proposal["barclamp"])
+
+          new_proposals << proposal
+        end
+
+        story.config.merge!("proposals" => new_proposals)
+      else
+        story.config.merge!("proposals" => devel_proposals)
       end
     end
 

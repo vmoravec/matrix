@@ -56,19 +56,16 @@ module Matrix
     end
 
     def finalize!
-      if @finalized && block_given?
-        yield self
-      end
-
       return if @finalized
 
       target_error.call
       @config = config[current_target.name]
+      Matrix.config.load_story_details(self)
       @finalized = true
       yield self if block_given?
     end
 
-    alias_method :begin, :finalize!
+    alias_method :begin!, :finalize!
 
     private
 

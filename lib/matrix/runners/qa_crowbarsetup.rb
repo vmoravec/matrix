@@ -1,6 +1,7 @@
 module Matrix
   class QaCrowbarSetupRunner < Runner
     COMMAND = "qa_crowbarsetup.sh"
+    DEFAULT_PLATFORM = "suse-12.0"
 
     def initialize
       super do
@@ -24,11 +25,37 @@ module Matrix
     def exec! action, admin_runlist: true
       @environment = config["mkcloud"].inject("") do |env, config_pair|
         key, value = config_pair
-        value.to_s.empty? ? env : env << "#{key}=#{value} "
+        value.to_s.empty? ? env : env << "export #{key}=#{value}; "
       end
       bin = "/root/#{COMMAND}"
       prepare = "source #{bin}; #{'onadmin_runlist' if admin_runlist} "
       super(prepare << action.to_s)
+    end
+
+    def configure_nodes
+      crowbar = CrowbarRunner.new
+      nodes = config["nodes"] || {}
+      configured_nodes = nodes.keys
+
+      crowbar.list_nodes.each do |node|
+        node = node.strip
+        next unless nodes[node]
+
+        role = nodes[node]["role"] || "compute"
+        platform = nodes[node]["platform"] || DEFAULT_PLATFORM
+        exec!(
+          "set_node_role_and_platform #{node} #{role} #{platform}",
+          admin_runlist: false
+        )
+      end
+    end
+
+    def ipmi_reboot
+      if story.target.name == "qa1"
+        command.exec!("curl http://clouddata.cloud.suse.de/git/automation/scripts/qa1_nodes_reboot | bash")
+      else
+        exec!("configure_ipmi", admin_runlist: false)
+      end
     end
   end
 end
