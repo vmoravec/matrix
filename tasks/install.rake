@@ -25,6 +25,7 @@ namespace :install do
     task :reload do
       rm_rf(automation_repo)
       invoke_task("install:automation:clone")
+      invoke_task("install:automation:checkout")
     end
 
     # Fetch the remote

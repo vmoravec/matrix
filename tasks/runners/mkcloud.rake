@@ -20,12 +20,12 @@ namespace :mkcloud do
   end
 
   desc "Nodes installed"
-  task :installnodes do
+  task :instnodes do
     mkcloud.exec! "setupnodes instnodes"
   end
 
-  desc "Controller node and compute node installed"
-  task :installproposal do
+  desc "Controller node and compute node installed, barclamps deployed"
+  task :proposals do
     mkcloud.exec! "proposal"
   end
 

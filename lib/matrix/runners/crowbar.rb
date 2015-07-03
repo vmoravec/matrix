@@ -19,10 +19,19 @@ module Matrix
     end
 
     def allocate
+      list_nodes.each do |machine|
+        puts machine
+        exec!("crowbar machines allocate #{machine}")
+        sleep 10
+        node_alias = machine.match(/-(\w+)\./).captures.first
+        exec!("cat >> .ssh/config<<EOF\nHost node #{node_alias}\nHostName #{machine}\nEOF")
+      end
     end
 
     #FIXME implement sleep, the wait_for thing does not support it
     def wait_all_discovered
+      sleep 200
+      return
       wait_for "All nodes are visible", max: "5 minutes", sleep: "10 seconds" do
         list_nodes.size == nodes.keys.size
       end
@@ -32,21 +41,6 @@ module Matrix
           exec!("knife node show -a state #{node}").output.match("discovered")
         end
       end
-# Implement this function here properly
-# echo "Allocating nodes..."
-#   local m
-#   for m in `get_all_discovered_nodes` ; do
-#       while knife node show -a state $m | grep discovered; do # workaround bnc#773041
-#           crowbar machines allocate "$m"
-#           sleep 10
-#       done
-#       local i=$(echo $m | sed "s/.*-0\?\([^-\.]*\)\..*/\1/g")
-#       cat >> .ssh/config <<EOF
-#Host node$i
-#   HostName $m
-#EOF
-#   done
-
     end
 
     def batch build: nil, export: nil

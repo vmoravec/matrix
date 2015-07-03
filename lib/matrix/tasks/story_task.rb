@@ -27,7 +27,7 @@ module Matrix
     def run_story
       log.info("Launching story '#{story.name}:#{story.desc}' for target '#{story.current_target.name}'")
       runner_tasks = story.runners.map do |runner_details|
-        story.runner_options = runner_details
+        story.runner_options = runner_details || {}
         RunnerTask.new(story)
       end
 

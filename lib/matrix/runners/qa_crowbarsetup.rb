@@ -50,11 +50,11 @@ module Matrix
       end
     end
 
-    def ipmi_reboot
+    def reboot
       if story.target.name == "qa1"
         command.exec!("curl http://clouddata.cloud.suse.de/git/automation/scripts/qa1_nodes_reboot | bash")
       else
-        exec!("configure_ipmi", admin_runlist: false)
+        exec!("reboot_nodes_via_ipmi", admin_runlist: false)
       end
     end
   end

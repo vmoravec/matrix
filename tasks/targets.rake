@@ -46,7 +46,7 @@ namespace :target do
       end
       puts "    Success!"
 
-      puts "Connection test for gate to #{target.name} cluster has been successful"
+      puts "Connection test for gate to #{target.name} hardware has been successful"
     else
       print "Testing ping to admin node: "
       ping = "ping -q -c 1 -W 5 #{target.admin_node.ip || target.admin_node.fqdn}"

@@ -10,7 +10,6 @@ targets:
         name: crowbar2
         user: root
     admin_node: &admin_node
-    admin_node:
       ip: 10.162.26.140
       fqdn: crowbar.cloud2adm.qa.suse.de
       ssh:

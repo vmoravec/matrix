@@ -1,7 +1,7 @@
 ---
 story:
   default:
-    desc: "Default setup"
+    desc: "Default cloud story"
     virtual:
       mkcloud: &default_mkcloud
         cloudsource: <%= ENV['cloudsource'] || 'develcloud6' %>
@@ -9,30 +9,27 @@ story:
         nodenumberlonelynode: <%= ENV['nodenumberlonelynode'] %>
         nodenumber: <%= ENV['nodenumber'] %>
         artifacts_dir: "log/"
+        TESTHEAD: 1
+        UPDATEREPOS: 1
 
       virsetup:
         image_size: 120G
 
       runners:
-        - mkcloud:cleanup:
-        - virsetup:configure:
-        - mkcloud:prepare:
-        - mkcloud:setupadmin:
+        - mkcloud:cleanup: {}
+        - virsetup:configure: {}
+        - mkcloud:prepare: {}
+        - mkcloud:setupadmin: {}
         - mkcloud:installcrowbar:
             timeout: "20 minutes"
             features:
               - admin
-        - mkcloud:installnodes:
-        - mkcloud:installproposal:
-            timeout: "25 minutes"
+        - mkcloud:instnodes: {}
+        - mkcloud:proposals:
+            timeout: "45 minutes"
             features:
               - admin
               - controller
-        - crowbar:batch:nova:
-            features:
-              - admin
-              - controller
-              - users
         - tempest:run:
             timeout: "20 minutes"
 
@@ -43,34 +40,65 @@ story:
         cloud: qa2
 
       runners:
-      - gate:prepare_admin:
-      - admin_vm:prepare:
+      - gate:prepare_admin:              {}
+      - admin_vm:prepare:                {}
       - qa_crowbarsetup:prepareinstallcrowbar:
           timeout: "2 minutes"
       - qa_crowbarsetup:installcrowbar:
           features:
             - admin
-      - qa_crowbarsetup:ipmi_reboot:
-      - crowbar:wait_all_discovered:
-          features:
-            - nodes
-      - qa_crowbarsetup:configure_nodes:
+      - qa_crowbarsetup:reboot:          {}
+      - crowbar:wait_all_discovered:     {}
+      - qa_crowbarsetup:configure_nodes: {}
       - crowbar:allocate:
           features:
             - admin
       - qa_crowbarsetup:waitcompute:
           features:
             - admin
-      # look at https://github.com/bmwiedemann/automation/commit/9dbabebfd779fab76e66c9c835ab28f3ebc141a9
-      # to fix the single proposal building and not all at once
-      # Use that patch to test proposal building one by one, not all at once
-      - tempest:run:
-          timeout: "30 minutes"
+      - qa_crowbarsetup:prepare_proposals: {}
+      - qa_crowbarsetup:proposal:database:
+          features:
+            - admin
+      - qa_crowbarsetup:proposal:rabbitmq:
+          features:
+            - admin
+      - qa_crowbarsetup:proposal:keystone:
+          features:
+            - admin
+      - qa_crowbarsetup:proposal:swift:
+          features:
+            - admin
+      - qa_crowbarsetup:proposal:glance:
+          features:
+            - admin
+      - qa_crowbarsetup:proposal:cinder:
+          features:
+            - admin
+      - qa_crowbarsetup:proposal:neutron:
+          features:
+            - admin
+      - qa_crowbarsetup:proposal:nova:
+          features:
+            - admin
+      - qa_crowbarsetup:proposal:nova_dashboard:
           features:
             - admin
             - controller
             - users
-            - images
+      - qa_crowbarsetup:proposal:heat:
+          features:
+            - admin
+            - controller
+            - users
+      - qa_crowbarsetup:proposal:trove:
+          features:
+            - admin
+            - controller
+            - users
+      - qa_crowbarsetup:proposal:tempest:
+      - qa_crowbarsetup:testsetup:
+          timeout: "30 minutes"
 
     qa3:
       <<: *qa2
