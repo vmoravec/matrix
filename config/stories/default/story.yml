@@ -54,6 +54,7 @@ story:
           features:
             - admin
       - qa_crowbarsetup:waitcompute:
+          timeout: "25 minutes"
           features:
             - admin
       - qa_crowbarsetup:prepare_proposals: {}
@@ -98,7 +99,7 @@ story:
             - users
       - qa_crowbarsetup:proposal:tempest:
       - qa_crowbarsetup:testsetup:
-          timeout: "30 minutes"
+          timeout: "60 minutes"
 
     qa3:
       <<: *qa2

@@ -1,7 +1,7 @@
 git:
   automation:
-    url: github.com:vmoravec/automation
-    branch: patches
+    url: github.com:suse-cloud/automation
+    branch: master
 
 cucumber:
   formats:

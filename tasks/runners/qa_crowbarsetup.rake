@@ -1,4 +1,9 @@
 namespace :qa_crowbarsetup do
+  desc "Run any custom command; provide command=COMMAND"
+  task :run do
+    qa_crowbarsetup.exec! ENV["command"]
+  end
+
   desc "Crowbar installation prepared"
   task :prepareinstallcrowbar do
     qa_crowbarsetup.exec! "prepareinstallcrowbar"

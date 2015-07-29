@@ -2,7 +2,7 @@ require 'timeout'
 
 module Matrix
   class RunnerTask
-    DEFAULT_TIMEOUT = "15 minutes"
+    DEFAULT_TIMEOUT = "20 minutes"
 
     include Utils::Helpers
 
