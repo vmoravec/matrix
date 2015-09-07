@@ -17,9 +17,9 @@ module Matrix
 
     def prepare_admin
       case story.target.name
-      when "qa2", "qa3"
+      when "qa2"# "qa3"
         libvirt_domain = story.target.gate.admin_vm.name
-        snapshot_source = "/var/lib/libvirt/images/#{libvirt_domain}.raw.snapshot-base_install"
+        snapshot_source = "/var/lib/libvirt/images/backup/#{libvirt_domain}.raw"
         snapshot_destination = "/var/lib/libvirt/images/#{libvirt_domain}.raw"
         domain_exists = exec!("virsh list | grep #{libvirt_domain}") rescue nil
         exec! "virsh destroy #{libvirt_domain}" if domain_exists

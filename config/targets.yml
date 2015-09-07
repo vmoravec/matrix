@@ -31,7 +31,8 @@ targets:
       fqdn: gate.cloud2adm.qa.suse.de
       user: root
       admin_vm:
-        name: crowbar2
+        name: crowbar2.sles12
+        domain: crowbar2
         user: root
     admin_node:
       <<: *admin_node
