@@ -1,0 +1,12 @@
+# Copy this file to config/development.yml
+# This file might help you with updating any configuration section found in
+# other yaml files as it gets merged into the configuration tree after
+# all files have been loaded. 
+
+# Example for updating the ip address of the admin node for virtual target
+# which is not defined by default in the targets.yml config
+
+targets:
+ virtual:
+   admin_node:
+     ip: 192.168.124.10

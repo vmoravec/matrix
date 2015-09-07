@@ -16,7 +16,12 @@ namespace :mkcloud do
 
   desc "Admin node installed"
   task :installcrowbar do
-    mkcloud.exec! "addupdaterepo runupdate prepareinstcrowbar instcrowbar"
+    mkcloud.exec! "prepareinstcrowbar instcrowbar"
+  end
+
+  desc "Update repos installed"
+  task :addupdates do
+    mkcloud.exec! "addupdaterepo runupdate"
   end
 
   desc "Nodes installed"
@@ -32,5 +37,10 @@ namespace :mkcloud do
   desc "Show the full path to mkcloud script"
   task :bin do
     mkcloud.bin
+  end
+
+  desc "Run custom mkcloud command; use: command=COMMAND"
+  task :run do
+    mkcloud.exec! ENV["command"]
   end
 end

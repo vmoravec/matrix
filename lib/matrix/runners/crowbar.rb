@@ -18,6 +18,12 @@ module Matrix
       list_machines.split.map(&:strip).grep(/\Ad/)
     end
 
+    def network_proposal
+      proposal = exec!("crowbar network proposal show default").output
+      networks = JSON.parse(proposal)["attributes"]["network"]["networks"]
+      puts ranges = networks["bmc"]["ranges"]
+    end
+
     def allocate
       list_nodes.each do |machine|
         puts machine

@@ -1,4 +1,9 @@
 namespace :crowbar do
+  desc "Run custom command"
+  task :run do
+    crowbar.exec!("crowbar #{ENV["command"]}").output
+  end
+
   desc "List machines"
   task :list_machines do
     crowbar.list_nodes.each_with_index do |machine, i|
@@ -9,6 +14,11 @@ namespace :crowbar do
   desc "All nodes discovered"
   task :wait_all_discovered do
     crowbar.wait_all_discovered
+  end
+
+  desc "Show network proposal"
+  task :show_network do
+    crowbar.network_proposal
   end
 
   desc "All nodes allocated"

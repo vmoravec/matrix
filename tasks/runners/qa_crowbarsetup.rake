@@ -6,12 +6,12 @@ namespace :qa_crowbarsetup do
 
   desc "Crowbar installation prepared"
   task :prepareinstallcrowbar do
-    qa_crowbarsetup.exec! "prepareinstallcrowbar"
+    qa_crowbarsetup.exec! "prepareinstallcrowbar", onadmin: true
   end
 
   desc "Crowbar installed"
   task :installcrowbar do
-    qa_crowbarsetup.exec! "installcrowbar"
+    qa_crowbarsetup.exec! "installcrowbar", onadmin: true
   end
 
   desc "Standalone node(s) registered with crowbar"
@@ -24,9 +24,19 @@ namespace :qa_crowbarsetup do
     qa_crowbarsetup.configure_nodes
   end
 
+  desc "Update repo added"
+  task :addupdaterepo do
+    qa_crowbarsetup.exec! "addupdaterepo", onadmin: true
+  end
+
+  desc "Update run"
+  task :runupdate do
+    qa_crowbarsetup.exec! "runupdate", onadmin: true
+  end
+
   desc "All nodes rebooted"
   task :reboot do
-    qa_crowbarsetup.reboot
+    qa_crowbarsetup.reboot_nodes
   end
 
   desc "Nodes installed and ready"
@@ -36,17 +46,17 @@ namespace :qa_crowbarsetup do
 
   desc "Nodes prepared for proposals' installation"
   task :prepare_proposals do
-    qa_crowbarsetup.exec! "prepare_proposals", admin_runlist: false
+    qa_crowbarsetup.exec! "prepare_proposals"
   end
 
   desc "Dashboard alias set"
   task :set_dashboard_alias do
-    qa_crowbarsetup.exec! "set_dashboard_alias", admin_runlist: false
+    qa_crowbarsetup.exec! "set_dashboard_alias"
   end
 
   desc "Testsetup done"
   task :testsetup do
-    qa_crowbarsetup.exec! "testsetup"
+    qa_crowbarsetup.exec! "testsetup", onadmin: true
   end
 
   namespace :proposal do
@@ -71,7 +81,7 @@ namespace :qa_crowbarsetup do
     @barclamps.each do |barclamp|
       desc "Barclamp #{barclamp} deployed"
       task barclamp do
-        qa_crowbarsetup.exec! "deploy_single_proposal #{barclamp}", admin_runlist: false
+        qa_crowbarsetup.exec! "deploy_single_proposal #{barclamp}"
       end
     end
   end

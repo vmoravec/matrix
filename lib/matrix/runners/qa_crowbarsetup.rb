@@ -22,14 +22,13 @@ module Matrix
       end
     end
 
-    def exec! action, admin_runlist: true
+    def exec! action, onadmin: false
+      action.prepend("onadmin_") if onadmin
       @environment = config["mkcloud"].inject("") do |env, config_pair|
         key, value = config_pair
         value.to_s.empty? ? env : env << "export #{key}=#{value}; "
       end
-      bin = "/root/#{COMMAND}"
-      prepare = "source #{bin}; #{'onadmin_runlist' if admin_runlist} "
-      super(prepare << action.to_s)
+      super(action.to_s.prepend("source /root/#{COMMAND}; "))
     end
 
     def configure_nodes
@@ -43,18 +42,16 @@ module Matrix
 
         role = nodes[node]["role"] || "compute"
         platform = nodes[node]["platform"] || DEFAULT_PLATFORM
-        exec!(
-          "set_node_role_and_platform #{node} #{role} #{platform}",
-          admin_runlist: false
-        )
+        exec!( "set_node_role_and_platform #{node} #{role} #{platform}")
       end
     end
 
-    def reboot
+    def reboot_nodes
       if story.target.name == "qa1"
         command.exec!("curl http://clouddata.cloud.suse.de/git/automation/scripts/qa1_nodes_reboot | bash")
       else
-        exec!("reboot_nodes_via_ipmi", admin_runlist: false)
+        exec!("reboot_nodes_via_ipmi")
+        sleep 150
       end
     end
   end

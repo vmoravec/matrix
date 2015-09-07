@@ -52,7 +52,7 @@ module Matrix
       attr_reader :ip, :fqdn, :user, :admin_vm, :command
 
       def initialize params
-        @ip = params["ip"] || Resolv.getaddress(params["fqdn"])
+        @ip = params["ip"]#|| Resolv.getaddress(params["fqdn"])
         @fqdn = params["fqdn"]
         @user = params["user"]
         return unless params["admin_vm"]

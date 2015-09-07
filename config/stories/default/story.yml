@@ -9,22 +9,22 @@ story:
         nodenumberlonelynode: <%= ENV['nodenumberlonelynode'] %>
         nodenumber: <%= ENV['nodenumber'] %>
         artifacts_dir: "log/"
-        TESTHEAD: 1
-        UPDATEREPOS: 1
+        TESTHEAD: <%= ENV['TESTHEAD'] || 1 %>
+        UPDATEREPOS: <%= ENV['UPDATEREPOS'] || 1 %>
 
       virsetup:
         image_size: 120G
 
       runners:
-        - mkcloud:cleanup: {}
-        - virsetup:configure: {}
-        - mkcloud:prepare: {}
-        - mkcloud:setupadmin: {}
+        - mkcloud:cleanup:
+        - virsetup:configure:
+        - mkcloud:prepare:
+        - mkcloud:setupadmin:
         - mkcloud:installcrowbar:
             timeout: "20 minutes"
             features:
               - admin
-        - mkcloud:instnodes: {}
+        - mkcloud:instnodes:
         - mkcloud:proposals:
             timeout: "45 minutes"
             features:
@@ -40,16 +40,17 @@ story:
         cloud: qa2
 
       runners:
-      - gate:prepare_admin:              {}
-      - admin_vm:prepare:                {}
+      - gate:prepare_admin:
+      - admin_vm:prepare:
       - qa_crowbarsetup:prepareinstallcrowbar:
-          timeout: "2 minutes"
+      - qa_crowbarsetup:addupdaterepo:
+      - qa_crowbarsetup:runupdate:
       - qa_crowbarsetup:installcrowbar:
           features:
             - admin
-      - qa_crowbarsetup:reboot:          {}
-      - crowbar:wait_all_discovered:     {}
-      - qa_crowbarsetup:configure_nodes: {}
+      - qa_crowbarsetup:reboot_nodes:
+      - crowbar:wait_all_discovered:
+      - qa_crowbarsetup:configure_nodes:
       - crowbar:allocate:
           features:
             - admin
@@ -57,7 +58,7 @@ story:
           timeout: "25 minutes"
           features:
             - admin
-      - qa_crowbarsetup:prepare_proposals: {}
+      - qa_crowbarsetup:prepare_proposals:
       - qa_crowbarsetup:proposal:database:
           features:
             - admin
