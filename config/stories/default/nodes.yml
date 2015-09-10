@@ -14,7 +14,7 @@ nodes:
 
     d00-25-90-e5-05-12.qa2.cloud.suse.de:
       platform: suse-12.0
-      role: storage
+      role: compute
 
     d00-25-90-e5-0b-aa.qa2.cloud.suse.de:
       platform: suse-12.0

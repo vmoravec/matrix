@@ -43,4 +43,9 @@ namespace :mkcloud do
   task :run do
     mkcloud.exec! ENV["command"]
   end
+
+  desc "Run cct tests"
+  task :cct do
+    mkcloud.exec! "cct"
+  end
 end

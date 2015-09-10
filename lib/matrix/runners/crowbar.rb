@@ -26,26 +26,24 @@ module Matrix
 
     def allocate
       list_nodes.each do |machine|
-        puts machine
         exec!("crowbar machines allocate #{machine}")
-        sleep 10
+        sleep 5
         node_alias = machine.match(/-(\w+)\./).captures.first
         exec!("cat >> .ssh/config<<EOF\nHost node #{node_alias}\nHostName #{machine}\nEOF")
       end
     end
 
-    #FIXME implement sleep, the wait_for thing does not support it
     def wait_all_discovered
-      sleep 200
-      return
       wait_for "All nodes are visible", max: "5 minutes", sleep: "10 seconds" do
-        list_nodes.size == nodes.keys.size
+        break if list_nodes.size == nodes.keys.size
       end
 
+      discovered = "discovered"
       wait_for "All nodes are discovered", max: "5 minutes", sleep: "10 seconds" do
-        list_nodes.each do |node|
-          exec!("knife node show -a state #{node}").output.match("discovered")
+        nodes_states = list_nodes.map do |node|
+          exec!("knife node show -a state #{node}").output.match(discovered).to_s
         end
+        break if nodes_states.select {|n| n == discovered }.size == nodes.keys.size
       end
     end
 

@@ -35,12 +35,12 @@ namespace :qa_crowbarsetup do
   end
 
   desc "All nodes rebooted"
-  task :reboot do
+  task :rebootnodes do
     qa_crowbarsetup.reboot_nodes
   end
 
   desc "Nodes installed and ready"
-  task :waitcompute do
+  task :waitcloud do
     qa_crowbarsetup.exec! "waitcloud"
   end
 

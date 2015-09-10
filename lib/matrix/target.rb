@@ -76,6 +76,7 @@ Description: #{desc}
 Gate:
   Fqdn:  #{gate.fqdn}
   User:  #{gate.user}
+  Admin domain: #{gate.admin_vm.domain}
   Admin vm:  #{gate.admin_vm.name if gate.admin_vm}
 Admin node:
   Ip:  #{admin_node.ip}

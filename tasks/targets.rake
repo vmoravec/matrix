@@ -13,8 +13,8 @@ namespace :target do
   end
 
   def detect_target
-    target = targets.find(ENV["target"])
-    abort "Missing target. Provide a target by `target=TARGET`" unless target
+    target = targets.find(ENV["name"])
+    abort "Missing target. Provide a target by `name=TARGET`" unless target
 
     target
   end

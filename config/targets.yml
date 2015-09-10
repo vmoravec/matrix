@@ -48,7 +48,8 @@ targets:
       fqdn: gate.cloud3adm.qa.suse.de
       user: root
       admin_vm:
-        name: crowbar3
+        domain: crowbar3
+        name: crowbar3.sles12
         user: root
     admin_node:
       <<: *admin_node

@@ -10,10 +10,10 @@ story:
         nodenumber: <%= ENV['nodenumber'] %>
         artifacts_dir: "log/"
         TESTHEAD: <%= ENV['TESTHEAD'] || 1 %>
-        UPDATEREPOS: <%= ENV['UPDATEREPOS'] || 1 %>
+        UPDATEREPOS: <%= ENV['UPDATEREPOS']%>
 
       virsetup:
-        image_size: 120G
+        image_size: 220G
 
       runners:
         - mkcloud:cleanup:
@@ -21,22 +21,27 @@ story:
         - mkcloud:prepare:
         - mkcloud:setupadmin:
         - mkcloud:installcrowbar:
-            timeout: "20 minutes"
+            timeout: "40 minutes"
             features:
               - admin
         - mkcloud:instnodes:
+            timeout: "40 minutes"
         - mkcloud:proposals:
-            timeout: "45 minutes"
+            timeout: "65 minutes"
             features:
               - admin
               - controller
+        - mkcloud:cct:
+            timeout: "30 minutes"
         - tempest:run:
-            timeout: "20 minutes"
+            timeout: "60 minutes"
 
 
     qa2: &qa2
       mkcloud:
         <<: *default_mkcloud
+        nodenumber: 7
+        want_ipmi: true
         cloud: qa2
 
       runners:
@@ -54,7 +59,7 @@ story:
       - crowbar:allocate:
           features:
             - admin
-      - qa_crowbarsetup:waitcompute:
+      - qa_crowbarsetup:waitcloud:
           timeout: "25 minutes"
           features:
             - admin
@@ -62,6 +67,7 @@ story:
       - qa_crowbarsetup:proposal:database:
           features:
             - admin
+            - barclamp:database
       - qa_crowbarsetup:proposal:rabbitmq:
           features:
             - admin
@@ -93,14 +99,19 @@ story:
             - admin
             - controller
             - users
+      - qa_crowbarsetup:proposal:manila:
+          features:
+            - admin
+            - controller
       - qa_crowbarsetup:proposal:trove:
           features:
             - admin
             - controller
             - users
       - qa_crowbarsetup:proposal:tempest:
+      - qa_crowbarsetup:set_dashboard_alias:
       - qa_crowbarsetup:testsetup:
-          timeout: "60 minutes"
+          timeout: "90 minutes"
 
     qa3:
       <<: *qa2

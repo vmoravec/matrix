@@ -11,7 +11,7 @@ module Matrix
 
         @command =
           RemoteCommand.new(
-            ip: gate.admin_vm.name,
+            ip: gate.admin_vm.domain,
             user: gate.admin_vm.user,
             proxy: {
               "user" => gate.user,
@@ -51,7 +51,6 @@ module Matrix
         command.exec!("curl http://clouddata.cloud.suse.de/git/automation/scripts/qa1_nodes_reboot | bash")
       else
         exec!("reboot_nodes_via_ipmi")
-        sleep 150
       end
     end
   end
