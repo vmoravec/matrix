@@ -57,12 +57,7 @@ story:
       - crowbar:wait_all_discovered:
       - qa_crowbarsetup:configure_nodes:
       - crowbar:allocate:
-          features:
-            - admin
       - qa_crowbarsetup:waitcloud:
-          timeout: "25 minutes"
-          features:
-            - admin
       - qa_crowbarsetup:prepare_proposals:
       - qa_crowbarsetup:proposal:database:
           features:

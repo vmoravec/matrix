@@ -41,7 +41,7 @@ namespace :qa_crowbarsetup do
 
   desc "Nodes installed and ready"
   task :waitcloud do
-    qa_crowbarsetup.exec! "waitcloud"
+    qa_crowbarsetup.exec! "waitcloud", onadmin: true
   end
 
   desc "Nodes prepared for proposals' installation"
