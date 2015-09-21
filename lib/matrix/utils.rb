@@ -17,21 +17,29 @@ module Matrix
 
       def wait_for event, options
         period, period_units = options[:max].split
-        sleep_period, sleep_units = options[:sleep].split if options[:sleep]
+
+        if options[:sleep]
+          sleep_period, sleep_units = options[:sleep].split
+          sleep_time = convert_to_seconds(sleep_period, sleep_units)
+        end
+
         timeout_time = convert_to_seconds(period, period_units)
-        sleep_time = convert_to_seconds(sleep_period, sleep_units)
         log.info("Setting timeout to '#{event}' to max #{options[:max]}")
-        timeout(timeout_time) do
-          (timeout_time / sleep_time).times do
-            yield
-            if options[:sleep]
-              log.info("Waiting for '#{event}', sleeping for more #{options[:sleep]}")
-              sleep(sleep_time)
+        Timeout.timeout(timeout_time) do
+          if options[:sleep]
+            (timeout_time / sleep_time).times do
+              yield
+              if options[:sleep]
+                log.info("Waiting for '#{event}', sleeping for more #{options[:sleep]}")
+                sleep(sleep_time)
+              end
             end
+          else
+            yield
           end
         end
       rescue Timeout::Error
-        message = "Failed to make #{event}, tiemout after #{options[:max]}"
+        message = "Failed to make #{event}, timeout after #{options[:max]}"
         log.error(message)
         raise message
       end

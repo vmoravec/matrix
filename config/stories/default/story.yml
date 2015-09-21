@@ -31,6 +31,8 @@ story:
             features:
               - admin
               - controller
+        - mkcloud:testsetup:
+            timeout: "60 minutes"
         - mkcloud:cct:
             timeout: "30 minutes"
         - tempest:run:
@@ -53,16 +55,16 @@ story:
       - qa_crowbarsetup:installcrowbar:
           features:
             - admin
-      - qa_crowbarsetup:reboot_nodes:
+      - qa_crowbarsetup:rebootnodes:
       - crowbar:wait_all_discovered:
       - qa_crowbarsetup:configure_nodes:
       - crowbar:allocate:
       - qa_crowbarsetup:waitcloud:
+          timeout: "40 minutes"
       - qa_crowbarsetup:prepare_proposals:
       - qa_crowbarsetup:proposal:database:
           features:
             - admin
-            - barclamp:database
       - qa_crowbarsetup:proposal:rabbitmq:
           features:
             - admin
@@ -107,11 +109,15 @@ story:
       - qa_crowbarsetup:set_dashboard_alias:
       - qa_crowbarsetup:testsetup:
           timeout: "90 minutes"
+      - qa_crowbarsetup:run_cct:
+          timeout: "60 minutes"
 
     qa3:
       <<: *qa2
       mkcloud:
         <<: *default_mkcloud
+        nodenumber: 8
+        want_ipmi: true
         cloud: qa3
 
     qa1:

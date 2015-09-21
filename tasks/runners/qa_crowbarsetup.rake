@@ -74,6 +74,7 @@ namespace :qa_crowbarsetup do
       nova_dashboard
       ceilometer
       heat
+      manila
       trove
       tempest
     )
