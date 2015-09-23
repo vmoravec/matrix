@@ -10,10 +10,12 @@ story:
         nodenumber: <%= ENV['nodenumber'] %>
         artifacts_dir: "log/"
         TESTHEAD: <%= ENV['TESTHEAD'] || 1 %>
-        UPDATEREPOS: <%= ENV['UPDATEREPOS']%>
+        UPDATEREPOS: <%= ENV['UPDATEREPOS'] || 1 %>
+        hacloud: <%= ENV['hacloud'] %>
+        clusterconfig: <%= ENV['clusterconfig'] %>
 
       virsetup:
-        image_size: 220G
+        image_size: 270G
 
       runners:
         - mkcloud:cleanup:
