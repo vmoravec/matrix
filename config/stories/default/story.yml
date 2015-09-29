@@ -9,8 +9,8 @@ story:
         nodenumberlonelynode: <%= ENV['nodenumberlonelynode'] %>
         nodenumber: <%= ENV['nodenumber'] %>
         artifacts_dir: "log/"
-        TESTHEAD: <%= ENV['TESTHEAD'] || 1 %>
-        UPDATEREPOS: <%= ENV['UPDATEREPOS'] || 1 %>
+        TESTHEAD: <%= ENV['TESTHEAD'] || 0 %>
+        UPDATEREPOS: <%= ENV['UPDATEREPOS'] || 0 %>
         hacloud: <%= ENV['hacloud'] %>
         clusterconfig: <%= ENV['clusterconfig'] %>
 
