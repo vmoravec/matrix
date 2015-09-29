@@ -9,8 +9,8 @@ story:
         nodenumberlonelynode: <%= ENV['nodenumberlonelynode'] %>
         nodenumber: <%= ENV['nodenumber'] %>
         artifacts_dir: "log/"
-        TESTHEAD: <%= ENV['TESTHEAD'] || 0 %>
-        UPDATEREPOS: <%= ENV['UPDATEREPOS'] || 0 %>
+        TESTHEAD: <%= ENV['TESTHEAD'] || '' %>
+        UPDATEREPOS: <%= ENV['UPDATEREPOS'] || '' %>
         hacloud: <%= ENV['hacloud'] %>
         clusterconfig: <%= ENV['clusterconfig'] %>
 
@@ -88,25 +88,15 @@ story:
       - qa_crowbarsetup:proposal:nova:
           features:
             - admin
-      - qa_crowbarsetup:proposal:nova_dashboard:
+      - qa_crowbarsetup:proposal:horizon_barclamp:
           features:
             - admin
             - controller
             - users
+      - qa_crowbarsetup:proposal:ceilometer:
       - qa_crowbarsetup:proposal:heat:
-          features:
-            - admin
-            - controller
-            - users
       - qa_crowbarsetup:proposal:manila:
-          features:
-            - admin
-            - controller
       - qa_crowbarsetup:proposal:trove:
-          features:
-            - admin
-            - controller
-            - users
       - qa_crowbarsetup:proposal:tempest:
       - qa_crowbarsetup:set_dashboard_alias:
       - qa_crowbarsetup:testsetup:

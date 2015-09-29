@@ -71,7 +71,7 @@ namespace :qa_crowbarsetup do
       cinder
       neutron
       nova
-      nova_dashboard
+      horizon_barclamp
       ceilometer
       heat
       manila

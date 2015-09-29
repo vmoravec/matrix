@@ -17,7 +17,7 @@ module Matrix
 
     def prepare_admin
       case story.target.name
-      when "qa2"# "qa3"
+      when "qa2", "qa3"
         libvirt_domain = story.target.gate.admin_vm.name
         snapshot_source = "/var/lib/libvirt/images/backup/#{libvirt_domain}.raw"
         snapshot_destination = "/var/lib/libvirt/images/#{libvirt_domain}.raw"
