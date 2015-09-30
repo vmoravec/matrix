@@ -1,0 +1,25 @@
+nodes:
+  qa3:
+    d00-25-90-e5-03-2c.qa3.cloud.suse.de:
+      platform: suse-12.0
+
+    d00-25-90-e5-03-42.qa3.cloud.suse.de:
+      platform: suse-12.0
+
+    d00-25-90-e5-03-44.qa3.cloud.suse.de:
+      platform: suse-12.0
+
+    d00-25-90-e5-03-46.qa3.cloud.suse.de:
+      platform: suse-12.0
+
+    d00-25-90-e5-05-0a.qa3.cloud.suse.de:
+      platform: suse-12.0
+
+    d00-25-90-e5-05-30.qa3.cloud.suse.de:
+      platform: suse-12.0
+
+    d00-25-90-e5-06-f4.qa3.cloud.suse.de:
+      platform: suse-12.0
+
+    d00-25-90-e5-0c-02.qa3.cloud.suse.de:
+      platform: suse-12.0

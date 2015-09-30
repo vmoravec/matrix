@@ -1,0 +1,63 @@
+story:
+  ha:
+    desc: "HA cloud story"
+    virtual:
+      mkcloud: &ha_mkcloud
+        cloudsource: <%= ENV['cloudsource'] || 'develcloud6' %>
+        networkingplugin: <%= ENV['networkingplugin'] || 'linuxbridge' %>
+        nodenumberlonelynode: <%= ENV['nodenumberlonelynode'] %>
+        nodenumber: <%= ENV['nodenumber'] || 8 %>
+        artifacts_dir: "log/"
+        TESTHEAD: <%= ENV['TESTHEAD'] || '' %>
+        UPDATEREPOS: <%= ENV['UPDATEREPOS'] || '' %>
+        hacloud: 1
+        clusterconfig: services+data=2:network=3
+
+      virsetup:
+        image_size: 370G
+
+      runners:
+        - mkcloud:cleanup:
+        - virsetup:configure:
+        - mkcloud:prepare:
+        - mkcloud:setupadmin:
+        - mkcloud:installcrowbar:
+            timeout: "40 minutes"
+            features:
+              - admin
+        - mkcloud:instnodes:
+            timeout: "40 minutes"
+        - mkcloud:proposals:
+            timeout: "65 minutes"
+            features:
+              - admin
+              - controller
+        - mkcloud:testsetup:
+            timeout: "60 minutes"
+        - mkcloud:cct:
+            timeout: "30 minutes"
+        - tempest:run:
+            timeout: "60 minutes"
+
+
+    qa3: &qa3
+      mkcloud:
+        <<: *ha_mkcloud
+        nodenumber: 8
+        want_ipmi: true
+        cloud: qa3
+
+      runners:
+      - gate:prepare_admin:
+      - admin_vm:prepare:
+      - qa_crowbarsetup:prepareinstallcrowbar:
+      - qa_crowbarsetup:installcrowbar:
+      - qa_crowbarsetup:allocate:
+      - qa_crowbarsetup:waitcloud:
+          timeout: "40 minutes"
+      - qa_crowbarsetup:proposal:
+          timeout: "60 minutes"
+      - qa_crowbarsetup:testsetup:
+          timeout: "90 minutes"
+      - qa_crowbarsetup:run_cct:
+          timeout: "60 minutes"
