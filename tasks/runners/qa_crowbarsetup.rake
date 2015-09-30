@@ -4,6 +4,11 @@ namespace :qa_crowbarsetup do
     qa_crowbarsetup.exec! ENV["command"]
   end
 
+  desc "Set cluster assignment"
+  task :cluster_node_assignment do
+    qa_crowbarsetup.exec! "cluster_node_assignment"
+  end
+
   desc "Crowbar installation prepared"
   task :prepareinstallcrowbar do
     qa_crowbarsetup.exec! "prepareinstallcrowbar", onadmin: true
