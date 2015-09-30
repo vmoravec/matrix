@@ -34,6 +34,11 @@ namespace :qa_crowbarsetup do
     qa_crowbarsetup.exec! "runupdate", onadmin: true
   end
 
+  desc "Allocate nodes"
+  task :allocate do
+    qa_crowbarsetup.exec! "allocate", onadmin: true
+  end
+
   desc "All nodes rebooted"
   task :rebootnodes do
     qa_crowbarsetup.reboot_nodes
@@ -57,6 +62,11 @@ namespace :qa_crowbarsetup do
   desc "Testsetup done"
   task :testsetup do
     qa_crowbarsetup.exec! "testsetup", onadmin: true
+  end
+
+  desc "Deploy all proposals automatically by mkcloud"
+  task :proposal do
+    qa_crowbarsetup.exec! "proposal", onadmin: true
   end
 
   namespace :proposal do

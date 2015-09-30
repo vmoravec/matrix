@@ -198,7 +198,6 @@ module Matrix
 
       #FIXME Remove this when slice_after has been added
       story = story.first[1..-1]
-
       raw << story.join if story
     end
 

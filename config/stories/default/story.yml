@@ -65,29 +65,13 @@ story:
           timeout: "40 minutes"
       - qa_crowbarsetup:prepare_proposals:
       - qa_crowbarsetup:proposal:database:
-          features:
-            - admin
       - qa_crowbarsetup:proposal:rabbitmq:
-          features:
-            - admin
       - qa_crowbarsetup:proposal:keystone:
-          features:
-            - admin
       - qa_crowbarsetup:proposal:swift:
-          features:
-            - admin
       - qa_crowbarsetup:proposal:glance:
-          features:
-            - admin
       - qa_crowbarsetup:proposal:cinder:
-          features:
-            - admin
       - qa_crowbarsetup:proposal:neutron:
-          features:
-            - admin
       - qa_crowbarsetup:proposal:nova:
-          features:
-            - admin
       - qa_crowbarsetup:proposal:horizon_barclamp:
           features:
             - admin
