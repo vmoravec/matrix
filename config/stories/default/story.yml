@@ -72,7 +72,7 @@ story:
       - qa_crowbarsetup:proposal:cinder:
       - qa_crowbarsetup:proposal:neutron:
       - qa_crowbarsetup:proposal:nova:
-      - qa_crowbarsetup:proposal:horizon_barclamp:
+      - qa_crowbarsetup:proposal:horizon:
           features:
             - admin
             - controller
