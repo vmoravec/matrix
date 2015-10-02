@@ -14,7 +14,7 @@ story:
         clusterconfig: services+data=2:network=3
 
       virsetup:
-        image_size: 370G
+        image_size: 360G
 
       runners:
         - mkcloud:cleanup:
