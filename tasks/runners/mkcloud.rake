@@ -48,4 +48,9 @@ namespace :mkcloud do
   task :cct do
     mkcloud.exec! "cct"
   end
+
+  desc "Run testsetup"
+  task :testsetup do
+    mkcloud.exec! "testsetup"
+  end
 end

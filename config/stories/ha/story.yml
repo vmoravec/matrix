@@ -12,9 +12,10 @@ story:
         UPDATEREPOS: <%= ENV['UPDATEREPOS'] || '' %>
         hacloud: 1
         clusterconfig: services+data=2:network=3
+        drbdnode_mac_vol: "52:54:01:77:77:01#cloud-node1-drbd+52:54:02:77:77:02#cloud-node2-drbd"
 
       virsetup:
-        image_size: 360G
+        image_size: 460G
 
       runners:
         - mkcloud:cleanup:
