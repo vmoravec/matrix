@@ -7,7 +7,7 @@ story:
         cloudsource: <%= ENV['cloudsource'] || 'develcloud6' %>
         networkingplugin: <%= ENV['networkingplugin'] || 'linuxbridge' %>
         nodenumberlonelynode: <%= ENV['nodenumberlonelynode'] %>
-        nodenumber: <%= ENV['nodenumber'] %>
+        nodenumber: <%= ENV['nodenumber'] || 7 %>
         artifacts_dir: "log/"
         TESTHEAD: <%= ENV['TESTHEAD'] || '' %>
         UPDATEREPOS: <%= ENV['UPDATEREPOS'] || '' %>
@@ -24,8 +24,6 @@ story:
         - mkcloud:setupadmin:
         - mkcloud:installcrowbar:
             timeout: "40 minutes"
-            features:
-              - admin
         - mkcloud:instnodes:
             timeout: "40 minutes"
         - mkcloud:proposals:

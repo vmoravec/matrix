@@ -19,8 +19,8 @@ module Matrix
       case story.target.name
       when "qa2", "qa3"
         libvirt_domain = story.target.gate.admin_vm.name
-        snapshot_source = "/var/lib/libvirt/images/backup/#{libvirt_domain}.raw"
-        snapshot_destination = "/var/lib/libvirt/images/#{libvirt_domain}.raw"
+        snapshot_source = "/var/lib/libvirt/images/backup/#{libvirt_domain}.qcow2"
+        snapshot_destination = "/var/lib/libvirt/images/#{libvirt_domain}.qcow2"
         domain_exists = exec!("virsh list | grep #{libvirt_domain}") rescue nil
         exec! "virsh destroy #{libvirt_domain}" if domain_exists
         exec! "cp #{snapshot_source} #{snapshot_destination}"

@@ -11,7 +11,7 @@ targets:
         user: root
     admin_node: &admin_node
       ip: 10.162.26.140
-      fqdn: crowbar.cloud2adm.qa.suse.de
+      fqdn:
       ssh:
         user: root
         password: linux
@@ -31,7 +31,7 @@ targets:
       fqdn: gate.cloud2adm.qa.suse.de
       user: root
       admin_vm:
-        name: crowbar2.sles12
+        name: crowbar2.sles12sp1
         domain: crowbar2
         user: root
     admin_node:
@@ -49,7 +49,7 @@ targets:
       user: root
       admin_vm:
         domain: crowbar3
-        name: crowbar3.sles12
+        name: crowbar3.sles12sp1
         user: root
     admin_node:
       <<: *admin_node
